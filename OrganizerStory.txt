@@ -1,0 +1,32 @@
+Organizer User Stories
+
+1. Event Creation & Management
+    => As an organizer, I want to create a new event with name, date, time, and venue details so that attendees can see and book it online.
+    => As an organizer, I want to upload a description and images for the event so that attendees have complete information.
+    => As an organizer, I want to set different ticket categories (VIP, General, Early Bird)   
+    so that I can offer tiered pricing.
+    => As an organizer, I want to update or cancel events so that attendees are notified about changes.
+
+2. Seating Arrangements
+    => As an organizer, I want to upload or create an interactive seating chart so that attendees can choose their preferred seats.
+    => As an organizer, I want to mark certain seats as unavailable or reserved so that they cannot be booked by the public.
+
+3. Ticket Sales & Discounts
+    => As an organizer, I want to set ticket prices for different seating sections so that pricing matches seat value.
+    => As an organizer, I want to create and manage discount codes so that I can run promotions.
+    => As an organizer, I want to limit ticket quantities per order so that more people have a chance to attend.
+
+4. Attendee Management
+    => As an organizer, I want to see a list of attendees so that I can plan for the event and send communications.
+    => As an organizer, I want to check in attendees via QR code scanning so that entry is quick and secure.
+    => As an organizer, I want to export attendee lists so that I can use them for offline records or marketing.
+
+5. Notifications & Communication
+    => As an organizer, I want to send automated confirmation emails after purchase so that attendees have their tickets.
+    => As an organizer, I want to send event reminder emails so that attendees don’t forget the event.
+    => As an organizer, I want to notify attendees about event changes or cancellations so that they stay informed.
+
+6. Reports & Analytics
+    => As an organizer, I want to view ticket sales reports so that I can track event performance.
+    => As an organizer, I want to see revenue reports so that I know how much money was made.
+    => As an organizer, I want to see seat occupancy reports so that I can understand booking trends.
