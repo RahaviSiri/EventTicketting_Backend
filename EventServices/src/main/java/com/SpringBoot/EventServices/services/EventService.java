@@ -1,12 +1,16 @@
 package com.SpringBoot.EventServices.services;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+// import com.SpringBoot.EventServices.config.CloudinaryConfig;
 import com.SpringBoot.EventServices.dto.EventDTO;
 import com.SpringBoot.EventServices.dto.EventWithDetailsDto;
 import com.SpringBoot.EventServices.dto.SeatingChartRequest;
@@ -15,6 +19,8 @@ import com.SpringBoot.EventServices.model.Event;
 import com.SpringBoot.EventServices.model.Venue;
 import com.SpringBoot.EventServices.repository.EventRepository;
 import com.SpringBoot.EventServices.repository.VenueRepository;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 
 import jakarta.transaction.Transactional;
 
@@ -30,11 +36,14 @@ public class EventService {
     @Autowired
     private SeatingServiceClient seatingServiceClient;
 
+    @Autowired
+    private Cloudinary cloudinary;
+
     public List<Event> getAllEvents() {
         return eventRepository.findAll();
     }
 
-    public Event createEvent(EventDTO eventDTO) {
+    public Event createEvent(EventDTO eventDTO, MultipartFile imageFile) {
         Event event = new Event();
         event.setOrganizerId(eventDTO.getOrganizerId());
 
@@ -50,6 +59,7 @@ public class EventService {
 
         event.setVenue(venue);
         event.setName(eventDTO.getName());
+        event.setCategory(eventDTO.getCategory());
         event.setDescription(eventDTO.getDescription());
         event.setStartDate(eventDTO.getStartDate());
         event.setStartTime(eventDTO.getStartTime());
@@ -58,6 +68,19 @@ public class EventService {
         event.setStatus("CREATED");
         event.setCreatedAt(LocalDateTime.now());
         event.setUpdatedAt(LocalDateTime.now());
+
+        // Upload image to Cloudinary
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                Map uploadResult = cloudinary.uploader().upload(imageFile.getBytes(), ObjectUtils.emptyMap());
+                if (uploadResult != null && uploadResult.get("secure_url") != null) {
+                    String imageUrl = uploadResult.get("secure_url").toString();
+                    event.setImageUrl(imageUrl);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         // Save event first to generate event ID for seating chart
         Event savedEvent = eventRepository.save(event);
@@ -80,7 +103,7 @@ public class EventService {
         return eventRepository.save(savedEvent);
     }
 
-    public Event updateEvent(Long eventId, EventDTO eventDTO) {
+    public Event updateEvent(Long eventId, EventDTO eventDTO, MultipartFile imageFile) {
         Event existingEvent = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found with ID: " + eventId));
 
@@ -99,6 +122,7 @@ public class EventService {
 
         // Update Event details
         existingEvent.setName(eventDTO.getName());
+        existingEvent.setCategory(eventDTO.getCategory());
         existingEvent.setDescription(eventDTO.getDescription());
         existingEvent.setStartDate(eventDTO.getStartDate());
         existingEvent.setStartTime(eventDTO.getStartTime());
@@ -107,46 +131,58 @@ public class EventService {
         existingEvent.setStatus("UPDATED");
         existingEvent.setUpdatedAt(LocalDateTime.now());
 
+        // Handle image update if new image uploaded
+        if (imageFile != null && !imageFile.isEmpty()) {
+            try {
+                Map uploadResult = cloudinary.uploader().upload(imageFile.getBytes(), ObjectUtils.emptyMap());
+                if (uploadResult != null && uploadResult.get("secure_url") != null) {
+                    String imageUrl = uploadResult.get("secure_url").toString();
+                    existingEvent.setImageUrl(imageUrl);
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
         // Inform Seating Service if needed (if layout changed)
-        if(venue.getCapacity() != null && venue.getCapacity() != existingEvent.getVenue().getCapacity()) {
+        if (venue.getCapacity() != null && venue.getCapacity() != existingEvent.getVenue().getCapacity()) {
             // If capacity changed, want to update the seating chart
             SeatingChartRequest seatingRequest = new SeatingChartRequest();
             seatingRequest.setEventId(existingEvent.getId());
             seatingRequest.setLayoutJson(generateDefaultLayoutJson(venue.getCapacity()));
-            seatingServiceClient.updateSeatingChart(existingEvent.getSeatingChartId(),seatingRequest);
+            seatingServiceClient.updateSeatingChart(existingEvent.getSeatingChartId(), seatingRequest);
 
         }
         return eventRepository.save(existingEvent);
     }
 
-
     private String generateDefaultLayoutJson(Integer capacity) {
         // Your logic to generate seating layout JSON, e.g.:
         // For simplicity, returning empty JSON here.
         return """
-        {
-        "seats": [
-            {
-            "seatNumber": "A1",
-            "row": "A",
-            "section": "Main",
-            "seatType": "VIP",
-            "isAccessible": false,
-            "status": "available"
-            },
-            {
-            "seatNumber": "A2",
-            "row": "A",
-            "section": "Main",
-            "seatType": "Regular",
-            "isAccessible": true,
-            "status": "available"
-            }
-        ]
-        }
-        """;
+                {
+                "seats": [
+                    {
+                    "seatNumber": "A1",
+                    "row": "A",
+                    "section": "Main",
+                    "seatType": "VIP",
+                    "isAccessible": false,
+                    "status": "available"
+                    },
+                    {
+                    "seatNumber": "A2",
+                    "row": "A",
+                    "section": "Main",
+                    "seatType": "Regular",
+                    "isAccessible": true,
+                    "status": "available"
+                    }
+                ]
+                }
+                """;
     }
-    
+
     @Transactional
     public void deleteEvent(Long eventId) {
         Event event = eventRepository.findById(eventId)
@@ -168,7 +204,8 @@ public class EventService {
             EventWithDetailsDto dto = new EventWithDetailsDto();
             dto.setEvent(event);
             dto.setVenue(venue);
-            dto.setSeatingChartId(event.getSeatingChartId());;
+            dto.setSeatingChartId(event.getSeatingChartId());
+            ;
 
             eventDetails.add(dto);
         }
