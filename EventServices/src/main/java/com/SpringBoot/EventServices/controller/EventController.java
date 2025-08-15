@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 
 @RestController
 @RequestMapping("/api/events")
+@CrossOrigin(origins = "http://localhost:5173")
 public class EventController {
 
     @Autowired
@@ -33,6 +35,11 @@ public class EventController {
     @GetMapping
     public List<Event> getAllEvents() {
         return eventService.getAllEvents();
+    }
+
+    @GetMapping("/{eventId}")
+    public Event getEventById(@PathVariable Long eventId) {
+        return eventService.getEventById(eventId);
     }
 
     @PostMapping(consumes = "multipart/form-data")
