@@ -212,4 +212,9 @@ public class EventService {
 
         return eventDetails;
     }
+
+    public Event getEventById(Long eventId) {
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with ID: " + eventId));
+    }
 }
