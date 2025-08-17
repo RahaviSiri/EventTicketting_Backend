@@ -1,0 +1,49 @@
+# === Node / React Frontends ===
+frontend-user/node_modules
+frontend-user/build
+frontend-user/.env
+frontend-user/.env.*
+
+frontend-admin/node_modules
+frontend-admin/build
+frontend-admin/.env
+frontend-admin/.env.*
+
+# === Backend (Java / Spring Boot) ===
+/backend/target/
+/backend/.mvn/
+/backend/.env
+/backend/.env.*
+
+# Gradle
+.gradle/
+/build/
+/out/
+
+# Maven
+.mvn/wrapper/maven-wrapper.jar
+**/target/
+!**/src/main/**/target/
+
+# === General Files ===
+node_modules/
+dist/
+coverage/
+.env
+.env.*
+*.log
+*.tmp
+
+# === IDE / Editor ===
+.vscode/
+.idea/
+*.iml
+
+# === OS Specific ===
+.DS_Store
+Thumbs.db
+
+# === Others ===
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
