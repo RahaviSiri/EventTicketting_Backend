@@ -31,6 +31,8 @@ public class Event {
 
     private Long seatingChartId;   // comes from Seating Service
     private String status;
+    private String category; // e.g., Concert, Sports, etc.
+    private String imageUrl; 
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
