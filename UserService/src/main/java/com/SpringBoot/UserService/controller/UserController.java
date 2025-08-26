@@ -28,14 +28,33 @@ public class UserController {
     @Autowired
     private UserRepository userRepository;
 
-    @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody User user) {
-        
-        // You should encode password before saving
-        user.setPasswordHash(new BCryptPasswordEncoder().encode(user.getPasswordHash()));
-        userRepository.save(user);
-        return ResponseEntity.ok("User registered successfully");
-    }
+    
+    
+@PostMapping("/register")
+public ResponseEntity<Map<String, String>> register(@RequestBody User user) {
+    // Encode raw password from frontend
+    user.setPasswordHash(new BCryptPasswordEncoder().encode(user.getPassword()));
+
+    // Optional: default role
+    if(user.getRole() == null) user.setRole("USER");
+
+    // Save to DB
+    userRepository.save(user);
+
+    // Return JSON instead of plain string
+    return ResponseEntity.ok(Map.of("message", "User registered successfully"));
+}
+
+
+    
+
+    // @PostMapping("/register")
+    // public ResponseEntity<String> register(@RequestBody User user) {
+    //     // You should encode password before saving
+    //     user.setPasswordHash(new BCryptPasswordEncoder().encode(user.getPasswordHash()));
+    //     userRepository.save(user);
+    //     return ResponseEntity.ok("User registered successfully");
+    // }
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody Map<String, String> payload) {
