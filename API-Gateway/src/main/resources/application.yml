@@ -1,0 +1,32 @@
+spring:
+  application:
+    name: API-Gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          globalcors:
+            cors-configurations:
+              "[/**]":
+                allowedorigins: "http://localhost:5173"
+                allowedmethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                allowedheaders:
+                  - "*"
+                allowcredentials: true
+          routes:
+            - id: event-service
+              uri: lb://EventServices
+              predicates:
+                - Path=/api/events/**
+            - id: user-service
+              uri: lb://UserService
+              predicates:
+                - Path=/api/users/**
+            - id: seating-service
+              uri: lb://SeatingService
+              predicates:
+                - Path=/api/seats/**

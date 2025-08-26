@@ -30,6 +30,7 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody User user) {
+        
         // You should encode password before saving
         user.setPasswordHash(new BCryptPasswordEncoder().encode(user.getPasswordHash()));
         userRepository.save(user);
