@@ -83,10 +83,8 @@ public class PaymentService {
             .setAmount(convertToStripeAmount(request.getAmount(), request.getCurrency()))
             .setCurrency(request.getCurrency().toLowerCase())
             .setDescription(request.getDescription())
-            .setMetadata(PaymentIntentCreateParams.Metadata.builder()
-                .put("ticketId", request.getTicketId().toString())
-                .put("userId", request.getUserId().toString())
-                .build())
+            .putMetadata("ticketId", request.getTicketId().toString())
+            .putMetadata("userId", request.getUserId().toString())
             .build();
         
         return PaymentIntent.create(params);
