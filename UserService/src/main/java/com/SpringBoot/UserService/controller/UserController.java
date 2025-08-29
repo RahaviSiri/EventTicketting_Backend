@@ -82,4 +82,11 @@ public class UserController {
         return ResponseEntity.ok(Map.of("message", "Role updated"));
     }
 
+    @GetMapping("/getUserID")
+    public ResponseEntity<?> getUserID(@RequestHeader("Authorization") String token) {
+        String email = jwtUtils.extractEmail(token);
+        Long userID = userService.getUserID(email);
+        return ResponseEntity.ok(Map.of("userID", userID));
+    }
+
 }
