@@ -34,4 +34,13 @@ public class UserService {
             System.out.println("User not found for email: " + email);
         }
     }
+
+    public Long getUserID(String email) {
+        var user = userRepository.findByEmail(email);
+        if(user.isPresent()){
+            System.out.println(user.get().getId());
+            return user.get().getId();
+        }
+        return null;
+    }
 }
