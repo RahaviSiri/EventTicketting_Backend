@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.SpringBoot.EventServices.dto.EventDTO;
 import com.SpringBoot.EventServices.dto.EventWithDetailsDto;
+import com.SpringBoot.EventServices.dto.SeatingChartRequest;
 import com.SpringBoot.EventServices.model.Event;
 import com.SpringBoot.EventServices.services.EventService;
 
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
 @RequestMapping("/api/events")
@@ -67,5 +69,20 @@ public class EventController {
         List<EventWithDetailsDto> eventDetails = eventService.getEventsWithDetailsByOrganizerId(organizerId);
         return ResponseEntity.ok(eventDetails);
     }
+
+    @PostMapping("/{eventId}/saveLayout")
+    public ResponseEntity<Event> saveLayout(@PathVariable Long eventId,
+                                            @RequestBody SeatingChartRequest request) {
+        System.out.println("Received layoutJson: " + request.getLayoutJson());
+        Event updatedEvent = eventService.updateSeatingLayout(eventId, request);
+        return ResponseEntity.ok(updatedEvent);
+    }
+
+    // public static class LayoutRequest {
+    //     private String layoutJson;
+
+    //     public String getLayoutJson() { return layoutJson; }
+    //     public void setLayoutJson(String layoutJson) { this.layoutJson = layoutJson; }
+    // }
 }
 
