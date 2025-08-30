@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-// import com.SpringBoot.EventServices.config.CloudinaryConfig;
 import com.SpringBoot.EventServices.dto.EventDTO;
 import com.SpringBoot.EventServices.dto.EventWithDetailsDto;
 import com.SpringBoot.EventServices.dto.SeatingChartRequest;
@@ -38,6 +37,7 @@ public class EventService {
 
     @Autowired
     private Cloudinary cloudinary;
+
 
     public List<Event> getAllEvents() {
         return eventRepository.findAll();
@@ -83,25 +83,27 @@ public class EventService {
         }
 
         // Save event first to generate event ID for seating chart
+        event.setSeatingChartId(null);
         Event savedEvent = eventRepository.save(event);
 
-        // Generate seating layout JSON (customize as needed)
-        String layoutJson = generateDefaultLayoutJson(venue.getCapacity());
-        System.out.println("Generated Layout JSON: " + layoutJson);
-
-        SeatingChartRequest seatingRequest = new SeatingChartRequest();
-        seatingRequest.setEventId(savedEvent.getId());
-        seatingRequest.setLayoutJson(layoutJson);
-
-        // Call Seating Service to create seating chart
-        SeatingChartResponse seatingResponse = seatingServiceClient.createSeatingChart(seatingRequest);
-
-        // Update event with seating chart ID and save
-        savedEvent.setSeatingChartId(seatingResponse.getId());
-        savedEvent.setUpdatedAt(LocalDateTime.now());
-
-        return eventRepository.save(savedEvent);
+        return savedEvent;
     }
+
+    public Event updateSeatingLayout(Long eventId, SeatingChartRequest request) {
+        // SeatingChartRequest request = new SeatingChartRequest();
+        // request.setLayoutJson(layoutJson);
+
+        // Call seating service
+        SeatingChartResponse chart = seatingServiceClient.saveOrUpdateLayout(eventId, request);
+
+        // Update Event with seatingChartId
+        Event event = getEventById(eventId);
+        event.setSeatingChartId(chart.getId());
+        event.setUpdatedAt(LocalDateTime.now());
+
+        return eventRepository.save(event);
+    }
+
 
     public Event updateEvent(Long eventId, EventDTO eventDTO, MultipartFile imageFile) {
         Event existingEvent = eventRepository.findById(eventId)
@@ -144,43 +146,7 @@ public class EventService {
             }
         }
 
-        // Inform Seating Service if needed (if layout changed)
-        if (venue.getCapacity() != null && venue.getCapacity() != existingEvent.getVenue().getCapacity()) {
-            // If capacity changed, want to update the seating chart
-            SeatingChartRequest seatingRequest = new SeatingChartRequest();
-            seatingRequest.setEventId(existingEvent.getId());
-            seatingRequest.setLayoutJson(generateDefaultLayoutJson(venue.getCapacity()));
-            seatingServiceClient.updateSeatingChart(existingEvent.getSeatingChartId(), seatingRequest);
-
-        }
         return eventRepository.save(existingEvent);
-    }
-
-    private String generateDefaultLayoutJson(Integer capacity) {
-        // Your logic to generate seating layout JSON, e.g.:
-        // For simplicity, returning empty JSON here.
-        return """
-                {
-                "seats": [
-                    {
-                    "seatNumber": "A1",
-                    "row": "A",
-                    "section": "Main",
-                    "seatType": "VIP",
-                    "isAccessible": false,
-                    "status": "available"
-                    },
-                    {
-                    "seatNumber": "A2",
-                    "row": "A",
-                    "section": "Main",
-                    "seatType": "Regular",
-                    "isAccessible": true,
-                    "status": "available"
-                    }
-                ]
-                }
-                """;
     }
 
     @Transactional
@@ -189,6 +155,7 @@ public class EventService {
                 .orElseThrow(() -> new RuntimeException("Event not found with ID: " + eventId));
         // Inform Seating Service to delete seating chart
         if (event.getSeatingChartId() != null) {
+            System.out.println("Deleting seating chart with ID: " + event.getSeatingChartId());
             seatingServiceClient.deleteSeatingChart(event.getSeatingChartId());
         }
         eventRepository.delete(event);
