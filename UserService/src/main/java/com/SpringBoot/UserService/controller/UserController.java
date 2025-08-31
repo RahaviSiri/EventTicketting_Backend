@@ -68,7 +68,7 @@ public class UserController {
 
     @GetMapping("/getRole")
     public ResponseEntity<?> getUserRole(@RequestHeader("Authorization") String token) {
-        String email = jwtUtils.extractEmail(token);
+        String email = jwtUtils.extractEmail(token.replace("Bearer ", "").trim());
         String role = userService.getUserRole(email);
         return ResponseEntity.ok(Map.of("role", role));
     }
@@ -76,7 +76,7 @@ public class UserController {
     @PostMapping("/setRole")
     public ResponseEntity<?> setUserRole(@RequestHeader("Authorization") String token,
                                         @RequestBody Map<String, String> body) {
-        String email = jwtUtils.extractEmail(token);
+        String email = jwtUtils.extractEmail(token.replace("Bearer ", "").trim());
         String role = body.get("role");
         userService.setUserRole(email, role);
         return ResponseEntity.ok(Map.of("message", "Role updated"));
@@ -84,7 +84,7 @@ public class UserController {
 
     @GetMapping("/getUserID")
     public ResponseEntity<?> getUserID(@RequestHeader("Authorization") String token) {
-        String email = jwtUtils.extractEmail(token);
+        String email = jwtUtils.extractEmail(token.replace("Bearer ", "").trim());
         Long userID = userService.getUserID(email);
         return ResponseEntity.ok(Map.of("userID", userID));
     }
