@@ -57,7 +57,7 @@ public class SeatingChartController {
         response.setEventId(chart.getEventId());
         response.setLayoutJson(chart.getLayoutJson());
         response.setCreatedAt(chart.getCreatedAt());
-
+System.err.println(response);
         return ResponseEntity.ok(response);
     }
 }
