@@ -3,30 +3,37 @@ spring:
     name: API-Gateway
   cloud:
     gateway:
-      server:
-        webflux:
-          globalcors:
-            cors-configurations:
-              "[/**]":
-                allowedOrigins: "http://localhost:5173"
-                allowedmethods:
-                  - GET
-                  - POST
-                  - PUT
-                  - DELETE
-                allowedheaders:
-                  - "*"
-                allowcredentials: true
-          routes:
-            - id: event-service
-              uri: lb://EventServices
-              predicates:
-                - Path=/api/events/**
-            - id: user-service
-              uri: lb://UserService
-              predicates:
-                - Path=/api/users/**
-            - id: seating-service
-              uri: lb://SeatingService
-              predicates:
-                - Path=/api/seating-charts/**
+    
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOrigins: "http://localhost:5173"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+            allowedHeaders:
+              - "*"
+            allowCredentials: true
+      routes:
+        - id: event-service
+          uri: lb://EventServices
+          predicates:
+            - Path=/api/events/**
+        - id: user-service
+          uri: lb://UserService
+          predicates:
+            - Path=/api/users/**
+        - id: seating-service
+          uri: lb://SeatingService
+          predicates:
+            - Path=/api/seating-charts/**
+        - id: ticket-service
+          uri: lb://TicketService
+          predicates:
+            - Path=/api/tickets/**
+        - id: payment-service
+          uri: lb://PaymentService
+          predicates:
+            - Path=/api/payments/**

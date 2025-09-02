@@ -172,7 +172,7 @@ public class TicketService {
             ticket.getTicketNumber(),
             ticket.getEventId(),
             ticket.getUserId(),
-            ticket.getSeatNumber(),
+            ticket.getSeatNumbers(),
             ticket.getTicketType(),
             ticket.getPrice(),
             ticket.getStatus(),
