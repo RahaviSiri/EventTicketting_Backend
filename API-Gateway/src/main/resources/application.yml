@@ -1,39 +1,42 @@
 spring:
   application:
     name: API-Gateway
+
   cloud:
     gateway:
-    
-      globalcors:
-        cors-configurations:
-          "[/**]":
-            allowedOrigins: "http://localhost:5173"
-            allowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-            allowedHeaders:
-              - "*"
-            allowCredentials: true
-      routes:
-        - id: event-service
-          uri: lb://EventServices
-          predicates:
-            - Path=/api/events/**
-        - id: user-service
-          uri: lb://UserService
-          predicates:
-            - Path=/api/users/**
-        - id: seating-service
-          uri: lb://SeatingService
-          predicates:
-            - Path=/api/seating-charts/**
-        - id: ticket-service
-          uri: lb://TicketService
-          predicates:
-            - Path=/api/tickets/**
-        - id: payment-service
-          uri: lb://PaymentService
-          predicates:
-            - Path=/api/payments/**
+      server:
+        webflux:
+          globalcors:
+            cors-configurations:
+              "[/**]":
+                allowedOrigins: "http://localhost:5173"
+                allowedMethods:
+                  - GET
+                  - POST
+                  - PUT
+                  - DELETE
+                allowedHeaders:
+                  - "*"
+                allowCredentials: true
+
+          routes:   # ✅ moved under server.webflux
+            - id: event-service
+              uri: lb://EventServices
+              predicates:
+                - Path=/api/events/**
+            - id: user-service
+              uri: lb://UserService
+              predicates:
+                - Path=/api/users/**
+            - id: seating-service
+              uri: lb://SeatingService
+              predicates:
+                - Path=/api/seating-charts/**
+            - id: ticket-service
+              uri: lb://TicketService
+              predicates:
+                - Path=/api/tickets/**
+            - id: payment-service
+              uri: lb://PaymentService
+              predicates:
+                - Path=/api/payments/**
