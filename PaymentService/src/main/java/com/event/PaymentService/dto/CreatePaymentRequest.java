@@ -13,8 +13,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CreatePaymentRequest {
 
-    @NotNull
-    private Long ticketId;
 
     @NotNull
     private Long userId;
@@ -29,5 +27,5 @@ public class CreatePaymentRequest {
     @NotBlank
     private String paymentMethod;
 
-    private String description;
+
 }

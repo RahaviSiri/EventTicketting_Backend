@@ -60,4 +60,24 @@ public class SeatingChartController {
 
         return ResponseEntity.ok(response);
     }
+
+
+    @PostMapping("/{eventId}/reserve/{seatNumber}")
+    public ResponseEntity<String> reserveSeat(@PathVariable Long eventId, @PathVariable String seatNumber) {
+        System.out.println("Reserving seat " + seatNumber + " for event " + eventId);
+        boolean reserved = seatingChartService.reserveSeat(eventId, seatNumber);
+        return reserved ? ResponseEntity.ok("Seat reserved") : ResponseEntity.badRequest().body("Seat not available");
+    }
+
+    @PostMapping("/{eventId}/confirm/{seatNumber}")
+    public ResponseEntity<String> confirmSeat(@PathVariable Long eventId, @PathVariable String seatNumber) {
+        boolean confirmed = seatingChartService.confirmSeat(eventId, seatNumber);
+        return confirmed ? ResponseEntity.ok("Seat booked") : ResponseEntity.badRequest().body("Seat not reserved");
+    }
+
+    @PostMapping("/{eventId}/release/{seatNumber}")
+    public ResponseEntity<String> releaseSeat(@PathVariable Long eventId, @PathVariable String seatNumber) {
+        boolean released = seatingChartService.releaseSeat(eventId, seatNumber);
+        return released ? ResponseEntity.ok("Seat released") : ResponseEntity.badRequest().body("Seat not reserved");
+    }
 }

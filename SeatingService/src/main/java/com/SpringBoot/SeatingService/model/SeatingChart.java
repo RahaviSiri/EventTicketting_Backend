@@ -1,11 +1,13 @@
 package com.SpringBoot.SeatingService.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import java.time.LocalDateTime;
 
+@Getter
+@Setter
 @Entity
-@Data
 @Table(name = "seating_charts")
 public class SeatingChart {
 
@@ -23,4 +25,8 @@ public class SeatingChart {
     // Stores seating layout in JSON format
 
     private LocalDateTime createdAt;
+
+    // Optimistic locking to prevent concurrent update conflicts
+    @Version
+    private Long version;
 }
