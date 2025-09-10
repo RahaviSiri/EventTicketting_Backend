@@ -44,3 +44,7 @@ spring:
               uri: lb://DiscountService
               predicates:
                 - Path=/api/discounts/**
+            - id: order-service
+              uri: lb://OrderService
+              predicates:
+                - Path=/api/orders/**
