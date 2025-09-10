@@ -26,7 +26,7 @@ public class SeatingChart {
 
     private LocalDateTime createdAt;
 
-    // Optimistic locking to prevent concurrent update conflicts
-    @Version
-    private Long version;
+    // // Optimistic locking to prevent concurrent update conflicts
+    // @Version
+    // private Long version;
 }

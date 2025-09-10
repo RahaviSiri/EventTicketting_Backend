@@ -18,6 +18,9 @@ import java.time.LocalDateTime;
 import java.time.Duration;
 // import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
+import com.SpringBoot.SeatingService.dto.SeatBatchResult;
 
 @Service
 public class SeatingChartService {
@@ -77,62 +80,77 @@ public class SeatingChartService {
     }
 
 
-     /**
-     * Reserve a seat (mark as reserved).
+
+    /**
+     * Atomically reserve multiple seats: check all seats are available (or expired reserved),
+     * and if so, mark them reserved and persist. If any seat is unavailable, return the
+     * list of unavailable seats and do not modify DB.
      */
     @Transactional
-    public boolean reserveSeat(Long eventId, String seatNumber) {
+    public SeatBatchResult reserveSeats(Long eventId, List<String> seatNumbers) {
         SeatingChart chart = seatingChartRepository.findByEventId(eventId)
                 .orElseThrow(() -> new RuntimeException("Chart not found"));
 
         try {
             JsonNode root = objectMapper.readTree(chart.getLayoutJson());
-            System.out.println("Root JSON: " + root.toString());
             ArrayNode seats = (ArrayNode) root.get("seats");
 
-
-            boolean updated = false;
+            List<String> unavailable = new ArrayList<>();
             LocalDateTime now = LocalDateTime.now();
-            for (JsonNode seat : seats) {
-                ObjectNode seatNode = (ObjectNode) seat;
-                if (seatNode.get("seatNumber").asText().equals(seatNumber)) {
-                    String status = seatNode.get("status").asText();
 
-                    // If available, reserve immediately
-                    if ("available".equalsIgnoreCase(status)) {
-                        seatNode.put("status", "reserved");
-                        // seatNode.put("reservedAt", now.toString());
-                        updated = true;
+            // First pass: check availability for all requested seats
+            for (String s : seatNumbers) {
+                String seatNumber = s == null ? "" : s.trim();
+                if (seatNumber.isEmpty()) continue;
+                boolean found = false;
+                boolean ok = false;
+                for (JsonNode seat : seats) {
+                    ObjectNode seatNode = (ObjectNode) seat;
+                    if (seatNode.get("seatNumber").asText().equals(seatNumber)) {
+                        found = true;
+                        String status = seatNode.get("status").asText();
+                        if ("available".equalsIgnoreCase(status)) {
+                            ok = true;
+                        } else if ("reserved".equalsIgnoreCase(status) && seatNode.has("reservedAt")) {
+                            LocalDateTime reservedAt = LocalDateTime.parse(seatNode.get("reservedAt").asText());
+                            if (isExpired(reservedAt, now)) {
+                                ok = true; // expired reservation treated as available
+                            }
+                        }
                         break;
                     }
-
-                    // If already reserved, check expiry and allow new reservation if expired
-                    if ("reserved".equalsIgnoreCase(status) && seatNode.has("reservedAt")) {
-                        LocalDateTime reservedAt = LocalDateTime.parse(seatNode.get("reservedAt").asText());
-                        if (isExpired(reservedAt, now)) {
-                            seatNode.put("status", "reserved");
-                            // seatNode.put("reservedAt", now.toString());
-                            updated = true;
-                            break;
-                        }
-                    }
-
-                    // Otherwise (booked or actively reserved) cannot reserve
-                    return false;
+                }
+                if (!found || !ok) {
+                    unavailable.add(seatNumber);
                 }
             }
 
-            if (updated) {
-                chart.setLayoutJson(objectMapper.writeValueAsString(root));
-                seatingChartRepository.save(chart);
-                System.out.println("Seat " + seatNumber + " reserved for event " + eventId);
-                return true;
+            if (!unavailable.isEmpty()) {
+                return new SeatBatchResult(false, unavailable);
             }
 
-            return false;
+            // Second pass: mark all requested seats as reserved
+            for (JsonNode seat : seats) {
+                ObjectNode seatNode = (ObjectNode) seat;
+                String seatNum = seatNode.get("seatNumber").asText();
+                for (String s : seatNumbers) {
+                    String requested = s == null ? "" : s.trim();
+                    if (requested.isEmpty()) continue;
+                    if (seatNum.equals(requested)) {
+                        seatNode.put("status", "reserved");
+                        seatNode.put("reservedAt", now.toString());
+                        break;
+                    }
+                }
+            }
+
+            // Persist
+            chart.setLayoutJson(objectMapper.writeValueAsString(root));
+            seatingChartRepository.save(chart);
+            return new SeatBatchResult(true, new ArrayList<>());
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to reserve seat", e);
+            throw new RuntimeException("Failed to reserve seats", e);
         }
     }
 
