@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tickets")
@@ -21,14 +22,24 @@ public class TicketController {
     
     // Create a new ticket
     @PostMapping
-    public ResponseEntity<TicketDTO> createTicket(@RequestBody CreateTicketRequest request) {
-        try {
-            TicketDTO ticket = ticketService.createTicket(request);
-            return new ResponseEntity<>(ticket, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+public ResponseEntity<Map<String, Object>> createTicket(@RequestBody CreateTicketRequest request) {
+    try {
+        System.out.println("Received ticket request: " + request);
+        TicketDTO ticket = ticketService.createTicket(request);
+
+        Map<String, Object> response = Map.of(
+            "ticketId", ticket.getId(),
+            "qrCode", ticket.getQrCode()   // <-- Base64 from DB
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    } catch (Exception e) {
+        e.printStackTrace();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
+}
+
+
     
     // Get ticket by ID
     @GetMapping("/{id}")
@@ -170,27 +181,4 @@ public class TicketController {
         }
     }
     
-    // Get expired tickets
-    @GetMapping("/expired")
-    public ResponseEntity<List<TicketDTO>> getExpiredTickets() {
-        try {
-            List<TicketDTO> tickets = ticketService.getExpiredTickets();
-            return new ResponseEntity<>(tickets, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-    
-    // Count tickets by event ID and status
-    @GetMapping("/event/{eventId}/status/{status}/count")
-    public ResponseEntity<Long> countTicketsByEventIdAndStatus(
-            @PathVariable Long eventId, 
-            @PathVariable TicketStatus status) {
-        try {
-            long count = ticketService.countTicketsByEventIdAndStatus(eventId, status);
-            return new ResponseEntity<>(count, HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
 }

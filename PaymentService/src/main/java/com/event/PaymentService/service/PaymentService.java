@@ -10,6 +10,8 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
+import com.stripe.param.AccountCreateParams.Capabilities.PaynowPayments;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -44,18 +46,16 @@ public class PaymentService {
 
             Payment payment = new Payment();
             payment.setPaymentId(paymentId);
-            payment.setTicketId(request.getTicketId());
             payment.setUserId(request.getUserId());
             payment.setAmount(request.getAmount());
             payment.setCurrency(request.getCurrency());
             payment.setStatus(PaymentStatus.PENDING);
             payment.setPaymentMethod(request.getPaymentMethod());
-            payment.setDescription(request.getDescription());
 
             Payment savedPayment = paymentRepository.save(payment);
-
+            System.out.println("okkkk");
             PaymentIntent paymentIntent = createStripePaymentIntent(request);
-
+            System.out.println("efjhsfd");
             savedPayment.setStripePaymentIntentId(paymentIntent.getId());
             paymentRepository.save(savedPayment);
 
@@ -79,10 +79,9 @@ public class PaymentService {
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                 .setAmount(convertToStripeAmount(request.getAmount(), request.getCurrency()))
                 .setCurrency(request.getCurrency().toLowerCase())
-                .setDescription(request.getDescription())
-                .putMetadata("ticketId", request.getTicketId().toString())
                 .putMetadata("userId", request.getUserId().toString())
                 .build();
+        System.out.println("Stripe PaymentIntent params: " + params.toString());
 
         return PaymentIntent.create(params);
     }

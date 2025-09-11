@@ -23,7 +23,7 @@ public class Payment {
     @Column(nullable = false, unique = true)
     private String paymentId;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long ticketId;
 
     @Column(nullable = false)

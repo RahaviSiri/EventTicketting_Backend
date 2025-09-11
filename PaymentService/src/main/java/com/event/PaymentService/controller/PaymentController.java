@@ -25,6 +25,7 @@ public class PaymentController {
     // Create a new payment
     @PostMapping
     public ResponseEntity<PaymentResponse> createPayment(@Valid @RequestBody CreatePaymentRequest request) {
+        System.out.println("Received payment request: " + request);
         try {
             PaymentResponse response = paymentService.createPayment(request);
             return new ResponseEntity<>(response, HttpStatus.CREATED);

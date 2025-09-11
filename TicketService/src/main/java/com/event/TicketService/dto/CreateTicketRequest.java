@@ -15,11 +15,9 @@ public class CreateTicketRequest {
     private Long eventId;
     private Long userId;
     private List<String> seatNumbers;
-    private String ticketType;
     private Double price;
     private LocalDateTime eventDate;
     private String venueName;
     private String eventName;
-    
     
 }
