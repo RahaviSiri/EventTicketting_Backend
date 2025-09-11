@@ -45,10 +45,4 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
     List<Ticket> findByEventDateBetween(@Param("startDate") LocalDateTime startDate, 
                                        @Param("endDate") LocalDateTime endDate);
     
-    // Count tickets by event ID and status
-    long countByEventIdAndStatus(Long eventId, TicketStatus status);
-    
-    // Find tickets that are expired (event date is in the past)
-    @Query("SELECT t FROM Ticket t WHERE t.eventDate < :currentDate AND t.status = 'CONFIRMED'")
-    List<Ticket> findExpiredTickets(@Param("currentDate") LocalDateTime currentDate);
 }

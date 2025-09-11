@@ -4,14 +4,15 @@ import com.event.TicketService.model.TicketStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@Data               // Generates getters, setters, toString, equals, hashCode
-@NoArgsConstructor  // Default constructor
-@AllArgsConstructor // Constructor with all fields
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class TicketDTO {
-
     private Long id;
     private String ticketNumber;
     private Long eventId;
@@ -21,8 +22,5 @@ public class TicketDTO {
     private Double price;
     private TicketStatus status;
     private LocalDateTime purchaseDate;
-    private LocalDateTime eventDate;
     private String qrCode;
-    private String venueName;
-    private String eventName;
 }

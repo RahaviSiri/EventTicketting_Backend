@@ -18,15 +18,11 @@ public class SeatingChart {
     // Store Event ID from Event Service
     private Long eventId;
 
-    // @Lob
-    // @Basic(fetch = FetchType.LAZY)
     @Column(columnDefinition = "TEXT")
     private String layoutJson; 
     // Stores seating layout in JSON format
 
     private LocalDateTime createdAt;
 
-    // // Optimistic locking to prevent concurrent update conflicts
-    // @Version
-    // private Long version;
+   
 }

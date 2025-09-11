@@ -37,13 +37,11 @@ public class TicketService {
         ticket.setEventId(request.getEventId());
         ticket.setUserId(request.getUserId());
         ticket.setSeatNumbers(request.getSeatNumbers());
-        ticket.setTicketType(request.getTicketType());
         ticket.setPrice(request.getPrice());
-        ticket.setStatus(TicketStatus.RESERVED);
+        ticket.setStatus(TicketStatus.CONFIRMED);
         ticket.setPurchaseDate(LocalDateTime.now());
         ticket.setEventDate(request.getEventDate());
-        ticket.setVenueName(request.getVenueName());
-        ticket.setEventName(request.getEventName());
+  
         
         // Generate QR code
         String qrCode = qrCodeService.generateQRCode(ticketNumber);
@@ -51,6 +49,7 @@ public class TicketService {
         
         // Save ticket
         Ticket savedTicket = ticketRepository.save(ticket);
+        
         
         return convertToDTO(savedTicket);
     }
@@ -147,18 +146,18 @@ public class TicketService {
                 .collect(Collectors.toList());
     }
     
-    // Get expired tickets
-    public List<TicketDTO> getExpiredTickets() {
-        List<Ticket> tickets = ticketRepository.findExpiredTickets(LocalDateTime.now());
-        return tickets.stream()
-                .map(this::convertToDTO)
-                .collect(Collectors.toList());
-    }
+    // // Get expired tickets
+    // public List<TicketDTO> getExpiredTickets() {
+    //     List<Ticket> tickets = ticketRepository.findExpiredTickets(LocalDateTime.now());
+    //     return tickets.stream()
+    //             .map(this::convertToDTO)
+    //             .collect(Collectors.toList());
+    // }
     
-    // Count tickets by event ID and status
-    public long countTicketsByEventIdAndStatus(Long eventId, TicketStatus status) {
-        return ticketRepository.countByEventIdAndStatus(eventId, status);
-    }
+    // // Count tickets by event ID and status
+    // public long countTicketsByEventIdAndStatus(Long eventId, TicketStatus status) {
+    //     return ticketRepository.countByEventIdAndStatus(eventId, status);
+    // }
     
     // Generate unique ticket number
     private String generateTicketNumber() {
@@ -167,20 +166,17 @@ public class TicketService {
     
     // Convert Ticket entity to DTO
     private TicketDTO convertToDTO(Ticket ticket) {
-        return new TicketDTO(
-            ticket.getId(),
-            ticket.getTicketNumber(),
-            ticket.getEventId(),
-            ticket.getUserId(),
-            ticket.getSeatNumbers(),
-            ticket.getTicketType(),
-            ticket.getPrice(),
-            ticket.getStatus(),
-            ticket.getPurchaseDate(),
-            ticket.getEventDate(),
-            ticket.getQrCode(),
-            ticket.getVenueName(),
-            ticket.getEventName()
-        );
-    }
+    return TicketDTO.builder()
+            .id(ticket.getId())
+            .ticketNumber(ticket.getTicketNumber())
+            .eventId(ticket.getEventId())
+            .userId(ticket.getUserId())
+            .seatNumbers(ticket.getSeatNumbers())
+            .price(ticket.getPrice())
+            .status(ticket.getStatus())
+            .purchaseDate(ticket.getPurchaseDate())
+            .qrCode(ticket.getQrCode())
+            .build();
+}
+
 }

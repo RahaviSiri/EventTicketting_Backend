@@ -1,8 +1,6 @@
 package com.SpringBoot.SeatingService.services;
 
-// import com.SpringBoot.SeatingService.model.Seat;
 import com.SpringBoot.SeatingService.model.SeatingChart;
-// import com.SpringBoot.SeatingService.repository.SeatRepository;
 import com.SpringBoot.SeatingService.repository.SeatingChartRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,7 +14,6 @@ import jakarta.transaction.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.Duration;
-// import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
 import java.util.List;
@@ -154,9 +151,7 @@ public class SeatingChartService {
         }
     }
 
-    /**
-     * Check if a reservedAt timestamp is expired compared to now and configured timeout.
-     */
+ 
     private boolean isExpired(LocalDateTime reservedAt, LocalDateTime now) {
         return Duration.between(reservedAt, now).compareTo(reservationTimeout) > 0;
     }

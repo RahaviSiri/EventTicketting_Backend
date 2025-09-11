@@ -27,13 +27,10 @@ public class Ticket {
     @Column(nullable = false)
     private Long userId;
 
-    @ElementCollection
-    @CollectionTable(name = "ticket_seats", joinColumns = @JoinColumn(name = "ticket_id"))
     @Column(name = "seat_number")
     private List<String> seatNumbers;
 
-    @Column(nullable = false)
-    private String ticketType; // VIP, Regular, Premium
+ 
 
     @Column(nullable = false)
     private Double price;
@@ -45,15 +42,10 @@ public class Ticket {
     @Column(nullable = false)
     private LocalDateTime purchaseDate;
 
-    @Column(nullable = false)
-    private LocalDateTime eventDate;
-
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String qrCode;
 
-    @Column
-    private String venueName;
+    @Column(name = "event_date")
+    private LocalDateTime eventDate;
 
-    @Column
-    private String eventName;
 }

@@ -70,11 +70,9 @@ public class SeatingChartController {
     }
 
 
-    // Endpoints accept seat numbers in the request body as either a JSON array (e.g. ["A1","A2"]) or a
-    // comma-separated string (e.g. "A1,A2"). Controller will parse and call service per-seat, then
-    // return an aggregated result.
+  
     @PostMapping("/{eventId}/reserve")
-public ResponseEntity<Map<String, Object>> reserveSeat(
+    public ResponseEntity<Map<String, Object>> reserveSeat(
         @PathVariable Long eventId,
         @RequestBody(required = false) SeatNumbersRequest req) {
     List<String> seats = req != null && req.getSeatNumbers() != null
@@ -128,6 +126,7 @@ public ResponseEntity<Map<String, Object>> confirmSeat(
 
     response.put("results", results);
     response.put("success", allSuccess);
+    
 
     return allSuccess ? ResponseEntity.ok(response) : ResponseEntity.badRequest().body(response);
 }
@@ -155,24 +154,8 @@ public ResponseEntity<Map<String, Object>> confirmSeat(
         return allSuccess ? ResponseEntity.ok(body) : ResponseEntity.badRequest().body(body);
     }
 
-    // Helper to accept either JSON array string or comma-separated simple string
-    private String[] parseSeatNumbers(String payload) {
-        if (payload == null) return new String[0];
-        payload = payload.trim();
-        // If payload starts with [ assume JSON array of strings
-        if (payload.startsWith("[")) {
-            try {
-                // crude parse: remove brackets and quotes then split by comma
-                String inner = payload.substring(1, Math.max(1, payload.length() - 1)).replaceAll("\"", "");
-                if (inner.trim().isEmpty()) return new String[0];
-                return inner.split(",");
-            } catch (Exception e) {
-                return new String[0];
-            }
-        }
-        // Otherwise treat as comma separated values
-        if (payload.contains(",")) return payload.split(",");
-        // Single seat string
-        return new String[]{payload};
-    }
+
+
+
+   
 }
