@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "tickets")
@@ -22,15 +21,14 @@ public class Ticket {
     private String ticketNumber;
 
     @Column(nullable = false)
+
     private Long eventId;
 
     @Column(nullable = false)
     private Long userId;
 
-    @Column(name = "seat_number")
-    private List<String> seatNumbers;
-
- 
+    @Column(columnDefinition = "TEXT")
+    private String seatNumbers;
 
     @Column(nullable = false)
     private Double price;
@@ -42,10 +40,14 @@ public class Ticket {
     @Column(nullable = false)
     private LocalDateTime purchaseDate;
 
-    @Column(columnDefinition = "TEXT")
+    @Lob
+    @Column(nullable = false)
     private String qrCode;
 
     @Column(name = "event_date")
     private LocalDateTime eventDate;
+
+    private String venue_name;
+    private String event_name;
 
 }

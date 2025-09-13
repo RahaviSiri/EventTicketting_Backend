@@ -1,7 +1,6 @@
 package com.event.TicketService.dto;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +13,7 @@ public class CreateTicketRequest {
 
     private Long eventId;
     private Long userId;
-    private List<String> seatNumbers;
+    private String seatNumbers;
     private Double price;
     private LocalDateTime eventDate;
     private String venueName;

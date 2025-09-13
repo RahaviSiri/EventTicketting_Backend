@@ -25,7 +25,7 @@ public class OrderController {
     OrderService orderService;
 
     @GetMapping("/event/{eventID}")
-    public ResponseEntity<?> getOrderByEventID(@PathVariable Long eventID) {
+    public ResponseEntity<List<Order>> getOrderByEventID(@PathVariable Long eventID) {
         List<Order> orders = orderService.getOrderByEventID(eventID);
         return ResponseEntity.ok(orders);
     }

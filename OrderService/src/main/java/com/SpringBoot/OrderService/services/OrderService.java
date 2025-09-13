@@ -31,17 +31,17 @@ public class OrderService {
     public Object createOrder(OrderCreateDTO dto) {
         // 1. Get user details from User Service
         UserDTO user = userServiceClient.getUserById(dto.getUserId());
+        System.out.println(user.getName());
 
         // 2. Build Order
         Order order = Order.builder()
                 .eventId(dto.getEventId())
                 .userId(dto.getUserId())
                 .ticketId(dto.getTicketId())
-                .ticketType(dto.getTicketType())
                 .price(dto.getPrice())
                 .attendeeName(user.getName())
                 .attendeeEmail(user.getEmail())
-                .status("Pending")
+                .status("Paid")
                 .checkIn(false)
                 .createdAt(LocalDateTime.now())
                 .build();

@@ -16,31 +16,30 @@ import java.util.Map;
 @RequestMapping("/api/tickets")
 // @CrossOrigin(origins = "*")
 public class TicketController {
-    
+
     @Autowired
     private TicketService ticketService;
-    
+
     // Create a new ticket
     @PostMapping
-public ResponseEntity<Map<String, Object>> createTicket(@RequestBody CreateTicketRequest request) {
-    try {
-        System.out.println("Received ticket request: " + request);
-        TicketDTO ticket = ticketService.createTicket(request);
+    public ResponseEntity<Map<String, Object>> createTicket(@RequestBody CreateTicketRequest request) {
+        try {
+            System.out.println("Received ticket request: " + request);
+            TicketDTO ticket = ticketService.createTicket(request);
 
-        Map<String, Object> response = Map.of(
-            "ticketId", ticket.getId(),
-            "qrCode", ticket.getQrCode()   // <-- Base64 from DB
-        );
+            Map<String, Object> response = Map.of(
+                    "ticketId", ticket.getId(),
+                    "qrCode", ticket.getQrCode() // <-- Base64 from DB
+            );
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    } catch (Exception e) {
-        e.printStackTrace();
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Failed to create ticket"));
+        }
     }
-}
 
-
-    
     // Get ticket by ID
     @GetMapping("/{id}")
     public ResponseEntity<TicketDTO> getTicketById(@PathVariable Long id) {
@@ -51,9 +50,7 @@ public ResponseEntity<Map<String, Object>> createTicket(@RequestBody CreateTicke
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    
 
-    
     // Get all tickets by user ID
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<TicketDTO>> getTicketsByUserId(@PathVariable Long userId) {
@@ -64,7 +61,7 @@ public ResponseEntity<Map<String, Object>> createTicket(@RequestBody CreateTicke
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     // Get all tickets by event ID
     @GetMapping("/event/{eventId}")
     public ResponseEntity<List<TicketDTO>> getTicketsByEventId(@PathVariable Long eventId) {
@@ -75,11 +72,11 @@ public ResponseEntity<Map<String, Object>> createTicket(@RequestBody CreateTicke
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     // Update ticket status
     @PutMapping("/{id}/status")
     public ResponseEntity<TicketDTO> updateTicketStatus(
-            @PathVariable Long id, 
+            @PathVariable Long id,
             @RequestParam TicketStatus status) {
         try {
             TicketDTO ticket = ticketService.updateTicketStatus(id, status);
@@ -88,7 +85,7 @@ public ResponseEntity<Map<String, Object>> createTicket(@RequestBody CreateTicke
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    
+
     // Confirm ticket
     @PutMapping("/{id}/confirm")
     public ResponseEntity<TicketDTO> confirmTicket(@PathVariable Long id) {
@@ -99,7 +96,7 @@ public ResponseEntity<Map<String, Object>> createTicket(@RequestBody CreateTicke
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    
+
     // Cancel ticket
     @PutMapping("/{id}/cancel")
     public ResponseEntity<TicketDTO> cancelTicket(@PathVariable Long id) {
@@ -110,7 +107,7 @@ public ResponseEntity<Map<String, Object>> createTicket(@RequestBody CreateTicke
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    
+
     // Mark ticket as used
     @PutMapping("/{id}/use")
     public ResponseEntity<TicketDTO> markTicketAsUsed(@PathVariable Long id) {
@@ -121,7 +118,7 @@ public ResponseEntity<Map<String, Object>> createTicket(@RequestBody CreateTicke
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    
+
     // Refund ticket
     @PutMapping("/{id}/refund")
     public ResponseEntity<TicketDTO> refundTicket(@PathVariable Long id) {
@@ -132,7 +129,7 @@ public ResponseEntity<Map<String, Object>> createTicket(@RequestBody CreateTicke
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    
+
     // Delete ticket
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTicket(@PathVariable Long id) {
@@ -143,7 +140,7 @@ public ResponseEntity<Map<String, Object>> createTicket(@RequestBody CreateTicke
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    
+
     // Get tickets by status
     @GetMapping("/status/{status}")
     public ResponseEntity<List<TicketDTO>> getTicketsByStatus(@PathVariable TicketStatus status) {
@@ -154,11 +151,11 @@ public ResponseEntity<Map<String, Object>> createTicket(@RequestBody CreateTicke
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     // Get tickets by user ID and status
     @GetMapping("/user/{userId}/status/{status}")
     public ResponseEntity<List<TicketDTO>> getTicketsByUserIdAndStatus(
-            @PathVariable Long userId, 
+            @PathVariable Long userId,
             @PathVariable TicketStatus status) {
         try {
             List<TicketDTO> tickets = ticketService.getTicketsByUserIdAndStatus(userId, status);
@@ -167,11 +164,11 @@ public ResponseEntity<Map<String, Object>> createTicket(@RequestBody CreateTicke
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     // Get tickets by event ID and status
     @GetMapping("/event/{eventId}/status/{status}")
     public ResponseEntity<List<TicketDTO>> getTicketsByEventIdAndStatus(
-            @PathVariable Long eventId, 
+            @PathVariable Long eventId,
             @PathVariable TicketStatus status) {
         try {
             List<TicketDTO> tickets = ticketService.getTicketsByEventIdAndStatus(eventId, status);
@@ -180,5 +177,5 @@ public ResponseEntity<Map<String, Object>> createTicket(@RequestBody CreateTicke
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
 }

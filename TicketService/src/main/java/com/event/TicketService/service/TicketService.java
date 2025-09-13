@@ -16,21 +16,19 @@ import java.util.stream.Collectors;
 
 @Service
 public class TicketService {
-    
+
     @Autowired
     private TicketRepository ticketRepository;
-    
+
     @Autowired
     private QRCodeService qrCodeService;
-    
+
     // Create a new ticket
     public TicketDTO createTicket(CreateTicketRequest request) {
-        
-    
-        
+
         // Generate unique ticket number
         String ticketNumber = generateTicketNumber();
-        
+
         // Create ticket
         Ticket ticket = new Ticket();
         ticket.setTicketNumber(ticketNumber);
@@ -41,19 +39,19 @@ public class TicketService {
         ticket.setStatus(TicketStatus.CONFIRMED);
         ticket.setPurchaseDate(LocalDateTime.now());
         ticket.setEventDate(request.getEventDate());
-  
-        
+        ticket.setVenue_name(request.getVenueName());
+        ticket.setEvent_name(request.getEventName());
+
         // Generate QR code
         String qrCode = qrCodeService.generateQRCode(ticketNumber);
         ticket.setQrCode(qrCode);
-        
+
         // Save ticket
         Ticket savedTicket = ticketRepository.save(ticket);
-        
-        
+
         return convertToDTO(savedTicket);
     }
-    
+
     // Get ticket by ID
     public TicketDTO getTicketById(Long id) {
         Optional<Ticket> ticket = ticketRepository.findById(id);
@@ -62,9 +60,7 @@ public class TicketService {
         }
         throw new RuntimeException("Ticket not found with id: " + id);
     }
-    
-  
-    
+
     // Get all tickets by user ID
     public List<TicketDTO> getTicketsByUserId(Long userId) {
         List<Ticket> tickets = ticketRepository.findByUserId(userId);
@@ -72,7 +68,7 @@ public class TicketService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    
+
     // Get all tickets by event ID
     public List<TicketDTO> getTicketsByEventId(Long eventId) {
         List<Ticket> tickets = ticketRepository.findByEventId(eventId);
@@ -80,7 +76,7 @@ public class TicketService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    
+
     // Update ticket status
     public TicketDTO updateTicketStatus(Long ticketId, TicketStatus newStatus) {
         Optional<Ticket> ticketOpt = ticketRepository.findById(ticketId);
@@ -92,27 +88,27 @@ public class TicketService {
         }
         throw new RuntimeException("Ticket not found with id: " + ticketId);
     }
-    
+
     // Confirm ticket (change status from RESERVED to CONFIRMED)
     public TicketDTO confirmTicket(Long ticketId) {
         return updateTicketStatus(ticketId, TicketStatus.CONFIRMED);
     }
-    
+
     // Cancel ticket
     public TicketDTO cancelTicket(Long ticketId) {
         return updateTicketStatus(ticketId, TicketStatus.CANCELLED);
     }
-    
+
     // Mark ticket as used
     public TicketDTO markTicketAsUsed(Long ticketId) {
         return updateTicketStatus(ticketId, TicketStatus.USED);
     }
-    
+
     // Refund ticket
     public TicketDTO refundTicket(Long ticketId) {
         return updateTicketStatus(ticketId, TicketStatus.REFUNDED);
     }
-    
+
     // Delete ticket
     public void deleteTicket(Long ticketId) {
         if (ticketRepository.existsById(ticketId)) {
@@ -121,7 +117,7 @@ public class TicketService {
             throw new RuntimeException("Ticket not found with id: " + ticketId);
         }
     }
-    
+
     // Get tickets by status
     public List<TicketDTO> getTicketsByStatus(TicketStatus status) {
         List<Ticket> tickets = ticketRepository.findByStatus(status);
@@ -129,7 +125,7 @@ public class TicketService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    
+
     // Get tickets by user ID and status
     public List<TicketDTO> getTicketsByUserIdAndStatus(Long userId, TicketStatus status) {
         List<Ticket> tickets = ticketRepository.findByUserIdAndStatus(userId, status);
@@ -137,7 +133,7 @@ public class TicketService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    
+
     // Get tickets by event ID and status
     public List<TicketDTO> getTicketsByEventIdAndStatus(Long eventId, TicketStatus status) {
         List<Ticket> tickets = ticketRepository.findByEventIdAndStatus(eventId, status);
@@ -145,38 +141,42 @@ public class TicketService {
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
     }
-    
+
     // // Get expired tickets
     // public List<TicketDTO> getExpiredTickets() {
-    //     List<Ticket> tickets = ticketRepository.findExpiredTickets(LocalDateTime.now());
-    //     return tickets.stream()
-    //             .map(this::convertToDTO)
-    //             .collect(Collectors.toList());
+    // List<Ticket> tickets =
+    // ticketRepository.findExpiredTickets(LocalDateTime.now());
+    // return tickets.stream()
+    // .map(this::convertToDTO)
+    // .collect(Collectors.toList());
     // }
-    
+
     // // Count tickets by event ID and status
-    // public long countTicketsByEventIdAndStatus(Long eventId, TicketStatus status) {
-    //     return ticketRepository.countByEventIdAndStatus(eventId, status);
+    // public long countTicketsByEventIdAndStatus(Long eventId, TicketStatus status)
+    // {
+    // return ticketRepository.countByEventIdAndStatus(eventId, status);
     // }
-    
+
     // Generate unique ticket number
     private String generateTicketNumber() {
         return "TKT-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
-    
+
     // Convert Ticket entity to DTO
     private TicketDTO convertToDTO(Ticket ticket) {
-    return TicketDTO.builder()
-            .id(ticket.getId())
-            .ticketNumber(ticket.getTicketNumber())
-            .eventId(ticket.getEventId())
-            .userId(ticket.getUserId())
-            .seatNumbers(ticket.getSeatNumbers())
-            .price(ticket.getPrice())
-            .status(ticket.getStatus())
-            .purchaseDate(ticket.getPurchaseDate())
-            .qrCode(ticket.getQrCode())
-            .build();
-}
+        return TicketDTO.builder()
+                .id(ticket.getId())
+                .ticketNumber(ticket.getTicketNumber())
+                .eventId(ticket.getEventId())
+                .userId(ticket.getUserId())
+                .seatNumbers(ticket.getSeatNumbers())
+                .price(ticket.getPrice())
+                .status(ticket.getStatus())
+                .purchaseDate(ticket.getPurchaseDate())
+                .qrCode(ticket.getQrCode())
+                .event_name(ticket.getEvent_name())
+                .venue_name(ticket.getVenue_name())
+                .build();
+    }
 
 }

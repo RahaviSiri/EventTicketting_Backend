@@ -29,7 +29,7 @@ public class SeatReleaseScheduler {
     // Reservation timeout in minutes
     private final Duration reservationTimeout = Duration.ofMinutes(5);
 
-    @Scheduled(fixedRate = 60000) // Run every 1 minute
+    @Scheduled(fixedRate = 60000)
     @Transactional
     public void releaseExpiredSeats() {
         List<SeatingChart> charts = seatingChartRepository.findAll();
@@ -38,13 +38,17 @@ public class SeatReleaseScheduler {
         for (SeatingChart chart : charts) {
             try {
                 JsonNode root = objectMapper.readTree(chart.getLayoutJson());
-                ArrayNode seats = (ArrayNode) root.get("seats");
+
+                ArrayNode seats = root.has("seats") && root.get("seats").isArray()
+                        ? (ArrayNode) root.get("seats")
+                        : objectMapper.createArrayNode();
+
                 boolean modified = false;
 
                 for (JsonNode seat : seats) {
                     ObjectNode seatNode = (ObjectNode) seat;
                     if ("reserved".equalsIgnoreCase(seatNode.get("status").asText())
-                        && seatNode.has("reservedAt")) {
+                            && seatNode.has("reservedAt")) {
 
                         LocalDateTime reservedAt = LocalDateTime.parse(seatNode.get("reservedAt").asText());
                         if (Duration.between(reservedAt, now).compareTo(reservationTimeout) > 0) {
@@ -65,7 +69,5 @@ public class SeatReleaseScheduler {
             }
         }
     }
-}
- 
-    
 
+}

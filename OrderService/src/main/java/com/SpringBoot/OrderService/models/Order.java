@@ -21,7 +21,6 @@ public class Order {
     private Long ticketId;
     private String attendeeName;
     private String attendeeEmail;
-    private String ticketType;
     private Double price;
     private String status;   // e.g., "Paid", "Pending"
     private boolean checkIn;
