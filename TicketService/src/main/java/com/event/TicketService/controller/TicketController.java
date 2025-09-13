@@ -178,4 +178,25 @@ public class TicketController {
         }
     }
 
+    @PostMapping("/getRevenueByEvents")
+    public Double getRevenueByEvents(@RequestBody List<Long> eventIds) {
+        return ticketService.getRevenueByEventIds(eventIds);
+    }
+
+    @PostMapping("/getTicketsByEvents")
+    public Long getTicketsByEvents(@RequestBody List<Long> eventIds) {
+        return ticketService.getTicketsByEventsIds(eventIds);
+    }
+
+    @GetMapping("/revenue/event/{eventId}")
+    public Double getRevenueForEvent(@PathVariable Long eventId) {
+        return ticketService.getRevenueByEventId(eventId);
+    }
+
+    @GetMapping("/count/{eventId}")
+    public ResponseEntity<Long> getTicketsSold(@PathVariable Long eventId) {
+        Long count = ticketService.getTicketsSoldByEvent(eventId);
+        return ResponseEntity.ok(count);
+    }
+
 }

@@ -179,4 +179,24 @@ public class TicketService {
                 .build();
     }
 
+    public Double getRevenueByEventIds(List<Long> eventIds) {
+        if (eventIds == null || eventIds.isEmpty())
+            return 0.0;
+        return ticketRepository.findRevenueByEventIds(eventIds);
+    }
+
+    public Long getTicketsByEventsIds(List<Long> eventIds) {
+        if (eventIds == null || eventIds.isEmpty())
+            return 0L;
+        return ticketRepository.countTicketsByEventIds(eventIds);
+    }
+
+    public Double getRevenueByEventId(Long eventId) {
+        return ticketRepository.findRevenueByEventId(eventId);
+    }
+
+    public Long getTicketsSoldByEvent(Long eventId) {
+        return ticketRepository.countTicketsByEvent(eventId);
+    }
+
 }
