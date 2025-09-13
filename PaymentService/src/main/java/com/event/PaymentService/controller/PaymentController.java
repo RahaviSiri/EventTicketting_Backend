@@ -18,10 +18,10 @@ import java.util.Map;
 @RequestMapping("/api/payments")
 // @CrossOrigin(origins = "*")
 public class PaymentController {
-    
+
     @Autowired
     private PaymentService paymentService;
-    
+
     // Create a new payment
     @PostMapping
     public ResponseEntity<PaymentResponse> createPayment(@Valid @RequestBody CreatePaymentRequest request) {
@@ -33,7 +33,7 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    
+
     // Confirm payment
     @PutMapping("/{paymentId}/confirm")
     public ResponseEntity<PaymentDTO> confirmPayment(@PathVariable String paymentId) {
@@ -44,7 +44,7 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    
+
     // Stripe webhook endpoint
     @PostMapping("/webhook")
     public ResponseEntity<String> handleStripeWebhook(@RequestBody Map<String, Object> payload) {
@@ -54,16 +54,16 @@ public class PaymentController {
             Map<String, Object> object = (Map<String, Object>) data.get("object");
             String paymentIntentId = (String) object.get("id");
             String status = (String) object.get("status");
-            
+
             // Process the webhook
             paymentService.processPaymentWebhook(paymentIntentId, status);
-            
+
             return new ResponseEntity<>("Webhook processed successfully", HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("Webhook processing failed: " + e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-    
+
     // Get payment by ID
     @GetMapping("/{id}")
     public ResponseEntity<PaymentDTO> getPaymentById(@PathVariable Long id) {
@@ -74,7 +74,7 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    
+
     // Get payment by payment ID
     @GetMapping("/payment-id/{paymentId}")
     public ResponseEntity<PaymentDTO> getPaymentByPaymentId(@PathVariable String paymentId) {
@@ -85,7 +85,7 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
-    
+
     // Get all payments by user ID
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<PaymentDTO>> getPaymentsByUserId(@PathVariable Long userId) {
@@ -96,7 +96,7 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     // Get all payments by ticket ID
     @GetMapping("/ticket/{ticketId}")
     public ResponseEntity<List<PaymentDTO>> getPaymentsByTicketId(@PathVariable Long ticketId) {
@@ -107,11 +107,11 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     // Update payment status
     @PutMapping("/{id}/status")
     public ResponseEntity<PaymentDTO> updatePaymentStatus(
-            @PathVariable Long id, 
+            @PathVariable Long id,
             @RequestParam PaymentStatus status) {
         try {
             PaymentDTO payment = paymentService.updatePaymentStatus(id, status);
@@ -120,7 +120,7 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    
+
     // Cancel payment
     @PutMapping("/{paymentId}/cancel")
     public ResponseEntity<PaymentDTO> cancelPayment(@PathVariable String paymentId) {
@@ -131,7 +131,7 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    
+
     // Refund payment
     @PutMapping("/{paymentId}/refund")
     public ResponseEntity<PaymentDTO> refundPayment(@PathVariable String paymentId) {
@@ -142,7 +142,7 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
     }
-    
+
     // Get payments by status
     @GetMapping("/status/{status}")
     public ResponseEntity<List<PaymentDTO>> getPaymentsByStatus(@PathVariable PaymentStatus status) {
@@ -153,11 +153,11 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     // Get payments by user ID and status
     @GetMapping("/user/{userId}/status/{status}")
     public ResponseEntity<List<PaymentDTO>> getPaymentsByUserIdAndStatus(
-            @PathVariable Long userId, 
+            @PathVariable Long userId,
             @PathVariable PaymentStatus status) {
         try {
             List<PaymentDTO> payments = paymentService.getPaymentsByUserIdAndStatus(userId, status);
@@ -166,7 +166,7 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     // Get failed payments
     @GetMapping("/failed")
     public ResponseEntity<List<PaymentDTO>> getFailedPayments() {
@@ -177,7 +177,7 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     // Get pending payments
     @GetMapping("/pending")
     public ResponseEntity<List<PaymentDTO>> getPendingPayments() {
@@ -188,7 +188,7 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     // Count payments by status
     @GetMapping("/status/{status}/count")
     public ResponseEntity<Long> countPaymentsByStatus(@PathVariable PaymentStatus status) {
@@ -199,11 +199,11 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
-    
+
     // Count payments by user ID and status
     @GetMapping("/user/{userId}/status/{status}/count")
     public ResponseEntity<Long> countPaymentsByUserIdAndStatus(
-            @PathVariable Long userId, 
+            @PathVariable Long userId,
             @PathVariable PaymentStatus status) {
         try {
             long count = paymentService.countPaymentsByUserIdAndStatus(userId, status);
@@ -212,4 +212,17 @@ public class PaymentController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    @PutMapping("/{paymentId}/assign-ticket/{ticketId}")
+    public ResponseEntity<PaymentDTO> assignTicketToPayment(
+            @PathVariable String paymentId,
+            @PathVariable Long ticketId) {
+        try {
+            PaymentDTO payment = paymentService.assignTicketToPayment(paymentId, ticketId);
+            return new ResponseEntity<>(payment, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+    }
+
 }

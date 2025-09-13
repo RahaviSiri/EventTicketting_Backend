@@ -10,7 +10,6 @@ import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
-import com.stripe.param.AccountCreateParams.Capabilities.PaynowPayments;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -37,6 +36,7 @@ public class PaymentService {
     // Initialize Stripe
     public PaymentService(@Value("${stripe.secret.key}") String stripeSecretKey) {
         Stripe.apiKey = stripeSecretKey;
+        System.out.printf("API Key ", stripeSecretKey);
     }
 
     // Create a new payment
@@ -66,8 +66,7 @@ public class PaymentService {
                     request.getAmount(),
                     request.getCurrency(),
                     "PENDING",
-                    "Payment created successfully"
-            );
+                    "Payment created successfully");
 
         } catch (Exception e) {
             throw new RuntimeException("Error creating payment: " + e.getMessage());
@@ -244,4 +243,17 @@ public class PaymentService {
     private String generatePaymentId() {
         return "PAY-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
     }
+
+    // Assign ticket ID to a payment
+    public PaymentDTO assignTicketToPayment(String paymentId, Long ticketId) {
+        Optional<Payment> paymentOpt = paymentRepository.findByPaymentId(paymentId);
+        if (paymentOpt.isPresent()) {
+            Payment payment = paymentOpt.get();
+            payment.setTicketId(ticketId); // Assuming you have ticketId field in Payment entity
+            Payment updatedPayment = paymentRepository.save(payment);
+            return paymentMapper.toDto(updatedPayment);
+        }
+        throw new RuntimeException("Payment not found with payment id: " + paymentId);
+    }
+
 }

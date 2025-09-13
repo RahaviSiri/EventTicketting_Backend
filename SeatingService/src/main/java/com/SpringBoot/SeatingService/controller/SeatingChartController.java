@@ -97,6 +97,9 @@ public class SeatingChartController {
 public ResponseEntity<Map<String, Object>> confirmSeat(
         @PathVariable Long eventId,
         @RequestBody(required = false) SeatNumbersRequest req) {
+    System.out.println("Raw request: " + req);
+    System.out.println("Seat numbers: " + (req != null ? req.getSeatNumbers() : "null"));
+
 
     Map<String, Object> response = new HashMap<>();
     response.put("eventId", eventId);
@@ -110,7 +113,14 @@ public ResponseEntity<Map<String, Object>> confirmSeat(
     List<Map<String, String>> results = new ArrayList<>();
     boolean allSuccess = true;
 
-    for (String seat : req.getSeatNumbers()) {
+    List<String> seats = req.getSeatNumbers();
+    System.out.println(seats);
+    if(seats.size() == 0){
+        response.put("success", false);
+        response.put("results", Collections.emptyList());
+        return ResponseEntity.badRequest().body(response);
+    }
+    for (String seat : seats) {
         seat = seat.trim();
         if (seat.isEmpty()) continue;
 
@@ -154,6 +164,7 @@ public ResponseEntity<Map<String, Object>> confirmSeat(
         return allSuccess ? ResponseEntity.ok(body) : ResponseEntity.badRequest().body(body);
     }
 
+    
 
 
 
