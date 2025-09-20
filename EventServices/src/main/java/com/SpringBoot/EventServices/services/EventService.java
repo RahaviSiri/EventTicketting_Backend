@@ -5,8 +5,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,9 +42,9 @@ public class EventService {
     @Autowired
     private Cloudinary cloudinary;
 
-
-    public List<Event> getAllEvents() {
-        return eventRepository.findAll();
+    public Page<Event> getAllEvents(Pageable pageable) {
+        Page<Event> events = eventRepository.findAll(pageable);
+        return events;
     }
 
     public Event createEvent(EventDTO eventDTO, MultipartFile imageFile) {
@@ -104,7 +108,6 @@ public class EventService {
         return eventRepository.save(event);
     }
 
-
     public Event updateEvent(Long eventId, EventDTO eventDTO, MultipartFile imageFile) {
         Event existingEvent = eventRepository.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found with ID: " + eventId));
@@ -161,6 +164,29 @@ public class EventService {
         eventRepository.delete(event);
     }
 
+    public Page<EventWithDetailsDto> getEventsWithDetailsByOrganizerId(Long organizerId, Pageable pageable) {
+        Page<Event> events = eventRepository.findByOrganizerId(organizerId, pageable);
+
+        List<EventWithDetailsDto> dtoList = events.getContent()
+                .stream()
+                .map(event -> {
+                    Venue venue = event.getVenue();
+                    EventWithDetailsDto dto = new EventWithDetailsDto();
+                    dto.setEvent(event);
+                    dto.setVenue(venue);
+                    dto.setSeatingChartId(event.getSeatingChartId());
+                    return dto;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(dtoList, pageable, events.getTotalElements());
+    }
+
+    public Event getEventById(Long eventId) {
+        return eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found with ID: " + eventId));
+    }
+
     public List<EventWithDetailsDto> getEventsWithDetailsByOrganizerId(Long organizerId) {
         List<Event> events = eventRepository.findByOrganizerId(organizerId);
         List<EventWithDetailsDto> eventDetails = new ArrayList<>();
@@ -178,10 +204,5 @@ public class EventService {
         }
 
         return eventDetails;
-    }
-
-    public Event getEventById(Long eventId) {
-        return eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found with ID: " + eventId));
     }
 }
