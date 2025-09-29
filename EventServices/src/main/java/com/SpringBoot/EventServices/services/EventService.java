@@ -47,8 +47,8 @@ public class EventService {
     private EventNotificationProducer eventNotificationProducer;
 
 
-    public List<Event> getAllEvents() {
-        return eventRepository.findAll();
+    // public List<Event> getAllEvents() {
+    //     return eventRepository.findAll();
 
     public Page<Event> getAllEvents(Pageable pageable) {
         Page<Event> events = eventRepository.findAll(pageable);

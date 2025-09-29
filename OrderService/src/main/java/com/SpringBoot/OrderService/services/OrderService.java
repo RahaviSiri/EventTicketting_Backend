@@ -25,8 +25,8 @@ public class OrderService {
     @Autowired
     NotificationProducer notificationProducer;
 
-    public List<Order> getOrderByEventID(Long eventID) {
-        return orderRepository.findByEventId(eventID);
+    // public List<Order> getOrderByEventID(Long eventID) {
+    //     return orderRepository.findByEventId(eventID);
 
     public Page<Order> getOrderByEventID(Long eventID, Pageable pageable) {
         return orderRepository.findByEventId(eventID, pageable);
