@@ -20,10 +20,10 @@ public class ReminderScheduler {
     @Autowired
     private UserServiceClient userServiceClient;
 
-    // // Run every 1 hour
-    // @Scheduled(fixedRateString = "${reminder.check.interval}")
-    @Scheduled(fixedRate = 60000, initialDelay = 30000)
-    public void sendReminders() {
+
+    // @Scheduled(fixedRate = 60000, initialDelay = 30000)
+@Scheduled(cron = "${reminder.check.interval}")
+public void sendReminders() {
         try {
             // 1. Fetch all tickets for upcoming events
             List<TicketDTO> tickets = ticketServiceClient.getTicketsForUpcomingEvents();
@@ -48,13 +48,42 @@ public class ReminderScheduler {
                 }
 
                 // 3. Send reminder email
-                String subject = "Event Reminder: " + ticket.getEvent_name();
-                String body = "<h2>Reminder: Your event is tomorrow!</h2>" +
-                              "<p><b>Event:</b> " + ticket.getEvent_name() + "<br>" +
-                              "<b>Venue:</b> " + ticket.getVenue_name() + "<br>" +
-                              "<b>Date & Time:</b> " + ticket.getEventDate() + "<br>" +
-                              "<b>Seats:</b> " + ticket.getSeatNumbers().replace(",", ", ") + "</p>";
+                String subject = "🎟️ Event Reminder: " + ticket.getEvent_name();
 
+String body = "<div style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>" +
+                "<div style='background-color: #4CAF50; padding: 15px; text-align: center; color: white; border-radius: 8px 8px 0 0;'>" +
+                    "<h2 style='margin: 0;'>Event Reminder</h2>" +
+                "</div>" +
+                
+                "<div style='padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 8px 8px; background-color: #f9f9f9;'>" +
+                    "<p style='font-size: 16px;'>Hello,</p>" +
+                    "<p style='font-size: 15px;'>This is a friendly reminder for your upcoming event happening <b>tomorrow</b>.</p>" +
+                    
+                    "<table style='width: 100%; border-collapse: collapse; margin-top: 15px;'>" +
+                        "<tr>" +
+                            "<td style='padding: 8px; font-weight: bold; width: 120px;'>🎤 Event:</td>" +
+                            "<td style='padding: 8px;'>" + ticket.getEvent_name() + "</td>" +
+                        "</tr>" +
+                        "<tr style='background-color: #fff;'>" +
+                            "<td style='padding: 8px; font-weight: bold;'>📍 Venue:</td>" +
+                            "<td style='padding: 8px;'>" + ticket.getVenue_name() + "</td>" +
+                        "</tr>" +
+                        "<tr>" +
+                            "<td style='padding: 8px; font-weight: bold;'>🗓 Date & Time:</td>" +
+                            "<td style='padding: 8px;'>" + ticket.getEventDate() + "</td>" +
+                        "</tr>" +
+                        "<tr style='background-color: #fff;'>" +
+                            "<td style='padding: 8px; font-weight: bold;'>💺 Seats:</td>" +
+                            "<td style='padding: 8px;'>" + ticket.getSeatNumbers().replace(",", ", ") + "</td>" +
+                        "</tr>" +
+                    "</table>" +
+                    
+                    "<p style='margin-top: 20px; font-size: 14px; color: #555;'>Please make sure to arrive at least 15 minutes before the event starts. We look forward to seeing you!</p>" +
+                    
+                    "<div style='margin-top: 25px; text-align: center;'>" +
+                    "</div>" +
+                "</div>" +
+            "</div>";
                 emailService.sendHtmlEmail(userEmail, subject, body);
                 System.out.println("✅ Reminder sent to " + userEmail);
             }

@@ -17,6 +17,9 @@ public class NotificationConsumer {
     @Autowired
     private TicketServiceClient ticketServiceClient;
 
+    @Autowired
+    private UserServiceClient userServiceClient;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @KafkaListener(topics = "order-confirmed", groupId = "notification-service")
@@ -44,20 +47,101 @@ public class NotificationConsumer {
         }
     }
 
-    @KafkaListener(topics = "event-updated", groupId = "notification-service")
-    public void handleEventUpdated(String message) {
-        System.out.println("Received event update: " + message);
-        // You can create a simpler HTML email if needed
-        try {
-            TicketDTO dummy = TicketDTO.builder()
-                                       .event_name("Event Update")
-                                       .seatNumbers("")
-                                       .qrCode("")
-                                       .venue_name("")
-                                       .build();
-            emailService.sendTicketEmail("user@example.com", "Event Update", dummy);
-        } catch(Exception e) { e.printStackTrace(); }
+@KafkaListener(topics = "event-updated", groupId = "notification-service")
+public void handleEventUpdated(String message) {
+    System.out.println("Received event update message: " + message);
+    try {
+        JsonNode node = objectMapper.readTree(message);
+        Long eventId = node.has("eventId") ? node.get("eventId").asLong() : null;
+        String note = node.has("note") ? node.get("note").asText() : "Event details have changed.";
+
+        if (eventId == null) {
+            System.err.println("eventId not found in message: " + message);
+            return;
+        }
+
+        // Fetch tickets for the event
+        System.out.println("Fetching tickets for eventId=" + eventId);
+        java.util.List<TicketDTO> tickets = ticketServiceClient.getTicketsByEventId(eventId);
+
+        if (tickets == null || tickets.isEmpty()) {
+            System.out.println("No tickets found for eventId=" + eventId);
+            return;
+        }
+
+        // For each ticket, fetch user and send email
+        for (TicketDTO ticket : tickets) {
+            try {
+                Long userId = ticket.getUserId();
+                String toEmail = null;
+                if (userId != null) {
+                    try {
+                        com.SpringBoot.NotificationService.dto.UserDTO user = userServiceClient.getUserById(userId);
+                        if (user != null) toEmail = user.getEmail();
+                    } catch (Exception fe) {
+                        System.err.println("Failed to fetch user " + userId + ": " + fe.getMessage());
+                    }
+                }
+
+                if (toEmail == null || toEmail.isBlank()) {
+                    System.err.println("No email for userId=" + userId + "; skipping");
+                    continue;
+                }
+
+                String subject = "📢 Event Update: " + ticket.getEvent_name();
+
+                // Styled HTML email body
+                String html =
+                    "<div style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>" +
+                        "<div style='background-color: #FF9800; padding: 15px; text-align: center; color: white; border-radius: 8px 8px 0 0;'>" +
+                            "<h2 style='margin: 0;'>Event Updated</h2>" +
+                        "</div>" +
+
+                        "<div style='padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 8px 8px; background-color: #fdfdfd;'>" +
+                            "<p style='font-size: 15px;'>Hello,</p>" +
+                            "<p style='font-size: 15px;'>" + note + "</p>" +
+
+                            "<table style='width: 100%; border-collapse: collapse; margin-top: 15px;'>" +
+                                "<tr>" +
+                                    "<td style='padding: 8px; font-weight: bold; width: 120px;'>🎤 Event:</td>" +
+                                    "<td style='padding: 8px;'>" + ticket.getEvent_name() + "</td>" +
+                                "</tr>" +
+                                "<tr style='background-color: #fff;'>" +
+                                    "<td style='padding: 8px; font-weight: bold;'>📍 Venue:</td>" +
+                                    "<td style='padding: 8px;'>" + (ticket.getVenue_name() == null ? "" : ticket.getVenue_name()) + "</td>" +
+                                "</tr>" +
+                                "<tr>" +
+                                    "<td style='padding: 8px; font-weight: bold;'>🗓 Date & Time:</td>" +
+                                    "<td style='padding: 8px;'>" + (ticket.getEventDate() == null ? "" : ticket.getEventDate()) + "</td>" +
+                                "</tr>" +
+                                "<tr style='background-color: #fff;'>" +
+                                    "<td style='padding: 8px; font-weight: bold;'>💺 Your Seats:</td>" +
+                                    "<td style='padding: 8px;'>" + (ticket.getSeatNumbers() == null ? "" : ticket.getSeatNumbers().replace(",", ", ")) + "</td>" +
+                                "</tr>" +
+                            "</table>" +
+
+                            "<p style='margin-top: 20px; font-size: 14px; color: #555;'>If the update affects your ticket (time/venue), we’ll contact you with the next steps.</p>" +
+
+                            "<div style='margin-top: 25px; text-align: center;'>" +
+                            "</div>" +
+                        "</div>" +
+                    "</div>";
+
+                // Send styled HTML email
+                emailService.sendHtmlEmail(toEmail, subject, html);
+
+                System.out.println("Sent event-update email to " + toEmail + " for ticket " + ticket.getId());
+
+            } catch (Exception inner) {
+                inner.printStackTrace();
+            }
+        }
+
+    } catch (Exception e) {
+        e.printStackTrace();
     }
+}
+
 
     @KafkaListener(topics = "event-cancelled", groupId = "notification-service")
     public void handleEventCancelled(String message) {

@@ -28,13 +28,9 @@ public class SeatingChartService {
     @Autowired
     private ObjectMapper objectMapper;
 
-    // Reservation timeout (default 5 minutes). Replaceable by external config if needed.
     private final Duration reservationTimeout = Duration.ofMinutes(5);
 
-    // @Autowired
-    // private SeatRepository seatRepository;
 
-    // Create or update seating chart
     public SeatingChart saveOrUpdateLayout(Long eventId, String layoutJson) {
         Optional<SeatingChart> existingChartOpt = seatingChartRepository.findByEventId(eventId);
         System.out.println("Layout JSON received: " + layoutJson);
@@ -60,11 +56,7 @@ public class SeatingChartService {
     @Transactional
     public boolean deleteSeatingChart(Long id) {
         if (seatingChartRepository.existsById(id)) {
-            // Delete all seats associated with this seating chart
-            // List<Seat> seats = seatRepository.findBySeatingChartId(id);
-            // seatRepository.deleteAll(seats);
-            
-            // Now delete the seating chart
+
             seatingChartRepository.deleteById(id);
             return true;
         }
@@ -78,15 +70,11 @@ public class SeatingChartService {
 
 
 
-    /**
-     * Atomically reserve multiple seats: check all seats are available (or expired reserved),
-     * and if so, mark them reserved and persist. If any seat is unavailable, return the
-     * list of unavailable seats and do not modify DB.
-     */
     @Transactional
     public SeatBatchResult reserveSeats(Long eventId, List<String> seatNumbers) {
-        SeatingChart chart = seatingChartRepository.findByEventId(eventId)
-                .orElseThrow(() -> new RuntimeException("Chart not found"));
+    // Fetch the seating chart with a pessimistic write lock to prevent concurrent reservations
+    SeatingChart chart = seatingChartRepository.findByEventIdForUpdate(eventId)
+        .orElseThrow(() -> new RuntimeException("Chart not found"));
 
         try {
             JsonNode root = objectMapper.readTree(chart.getLayoutJson());
@@ -156,28 +144,22 @@ public class SeatingChartService {
         return Duration.between(reservedAt, now).compareTo(reservationTimeout) > 0;
     }
 
-    /**
-     * Confirm payment → reserved → booked
-     */
+   
     @Transactional
     public boolean confirmSeat(Long eventId, String seatNumber) {
         return updateSeatStatus(eventId, seatNumber, "reserved", "booked");
     }
 
-    /**
-     * Payment failed/timeout → reserved → available
-     */
+
     @Transactional
     public boolean releaseSeat(Long eventId, String seatNumber) {
         return updateSeatStatus(eventId, seatNumber, "reserved", "available");
     }
 
-    /**
-     * Generic seat status update with check.
-     */
+
     private boolean updateSeatStatus(Long eventId, String seatNumber, String fromStatus, String toStatus) {
-        SeatingChart chart = seatingChartRepository.findByEventId(eventId)
-                .orElseThrow(() -> new RuntimeException("Chart not found"));
+    SeatingChart chart = seatingChartRepository.findByEventIdForUpdate(eventId)
+        .orElseThrow(() -> new RuntimeException("Chart not found"));
 
         try {
             JsonNode root = objectMapper.readTree(chart.getLayoutJson());

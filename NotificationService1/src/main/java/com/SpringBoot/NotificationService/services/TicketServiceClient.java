@@ -17,6 +17,9 @@ public interface TicketServiceClient {
 
     @GetMapping("/api/tickets/upcoming")
     List<TicketDTO> getTicketsForUpcomingEvents();
+
+    @GetMapping("/api/tickets/event/{eventId}")
+    List<TicketDTO> getTicketsByEventId(@PathVariable Long eventId);
 }
     
 
