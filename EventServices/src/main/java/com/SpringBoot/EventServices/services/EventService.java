@@ -42,9 +42,18 @@ public class EventService {
     @Autowired
     private Cloudinary cloudinary;
 
+
+    @Autowired
+    private EventNotificationProducer eventNotificationProducer;
+
+
+    public List<Event> getAllEvents() {
+        return eventRepository.findAll();
+
     public Page<Event> getAllEvents(Pageable pageable) {
         Page<Event> events = eventRepository.findAll(pageable);
         return events;
+
     }
 
     public Event createEvent(EventDTO eventDTO, MultipartFile imageFile) {
@@ -149,7 +158,19 @@ public class EventService {
             }
         }
 
-        return eventRepository.save(existingEvent);
+        Event saved = eventRepository.save(existingEvent);
+
+        // Publish event-updated message for NotificationService to inform ticket holders
+        try {
+            String payload = String.format("{\"eventId\": %d, \"note\": \"The event '%s' has been updated. Please check new details.\"}",
+                    saved.getId(), saved.getName());
+            eventNotificationProducer.publishEventUpdated(payload);
+            System.out.println("Published event-updated for eventId=" + saved.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return saved;
     }
 
     @Transactional

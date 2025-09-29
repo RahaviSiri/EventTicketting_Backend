@@ -199,4 +199,16 @@ public class TicketController {
         return ResponseEntity.ok(count);
     }
 
+    // Get upcoming tickets (events happening within next 24 hours)
+    @GetMapping("/upcoming")
+    public ResponseEntity<List<TicketDTO>> getUpcomingTickets() {
+        try {
+            List<TicketDTO> tickets = ticketService.getTicketsForUpcomingEvents();
+            return new ResponseEntity<>(tickets, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 }

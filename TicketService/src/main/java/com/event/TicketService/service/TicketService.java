@@ -176,6 +176,7 @@ public class TicketService {
                 .qrCode(ticket.getQrCode())
                 .event_name(ticket.getEvent_name())
                 .venue_name(ticket.getVenue_name())
+                .eventDate(ticket.getEventDate())
                 .build();
     }
 
@@ -197,6 +198,14 @@ public class TicketService {
 
     public Long getTicketsSoldByEvent(Long eventId) {
         return ticketRepository.countTicketsByEvent(eventId);
+    }
+
+    // Get tickets for events happening within the next 24 hours
+    public List<TicketDTO> getTicketsForUpcomingEvents() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime next24 = now.plusHours(24);
+        List<com.event.TicketService.model.Ticket> tickets = ticketRepository.findByEventDateBetween(now, next24);
+        return tickets.stream().map(this::convertToDTO).collect(Collectors.toList());
     }
 
 }

@@ -40,7 +40,6 @@ public class Ticket {
     @Column(nullable = false)
     private LocalDateTime purchaseDate;
 
-    @Lob
     @Column(nullable = false)
     private String qrCode;
 

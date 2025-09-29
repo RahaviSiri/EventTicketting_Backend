@@ -23,4 +23,5 @@ public class TicketDTO {
     private String qrCode;
     private String venue_name;
     private String event_name;
+    private LocalDateTime eventDate;
 }
