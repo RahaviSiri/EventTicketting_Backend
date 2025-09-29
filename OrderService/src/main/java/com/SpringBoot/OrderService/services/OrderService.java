@@ -1,7 +1,8 @@
 package com.SpringBoot.OrderService.services;
 
 import java.time.LocalDateTime;
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,15 +21,20 @@ public class OrderService {
     @Autowired
     UserServiceClient userServiceClient;
 
+
     @Autowired
     NotificationProducer notificationProducer;
 
     public List<Order> getOrderByEventID(Long eventID) {
         return orderRepository.findByEventId(eventID);
+
+    public Page<Order> getOrderByEventID(Long eventID, Pageable pageable) {
+        return orderRepository.findByEventId(eventID, pageable);
+
     }
 
-    public List<Order> getOrderByUserID(Long userID) {
-        return orderRepository.findByUserId(userID);
+    public Page<Order> getOrderByUserID(Long userID, Pageable pageable) {
+        return orderRepository.findByUserId(userID, pageable);
     }
 
     public Object createOrder(OrderCreateDTO dto) {
