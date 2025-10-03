@@ -40,13 +40,16 @@ public class Ticket {
     @Column(nullable = false)
     private LocalDateTime purchaseDate;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String qrCode;
 
-    @Column(name = "event_date")
+    @Column(nullable = false, name = "event_date")
     private LocalDateTime eventDate;
 
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String venue_name;
+
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String event_name;
 
 }

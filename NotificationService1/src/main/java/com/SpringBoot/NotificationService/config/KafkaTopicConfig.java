@@ -28,4 +28,10 @@ public class KafkaTopicConfig {
     public NewTopic reminderTasksTopic() {
         return TopicBuilder.name("reminder-tasks").build();
     }
+
+    @Bean
+    public NewTopic contactMessagesTopic() {
+        return TopicBuilder.name("contact-messages").build();
+    }
+
 }
