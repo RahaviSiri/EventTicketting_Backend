@@ -204,4 +204,41 @@ public class NotificationConsumer {
         }
     }
 
+    @KafkaListener(topics = "user-created", groupId = "notification-service")
+    public void handleUserCreated(String message) {
+        try {
+            System.out.println("Received user-created message: " + message);
+            JsonNode node = new ObjectMapper().readTree(message);
+            String userEmail = node.has("email") ? node.get("email").asText() : null;
+            String userName = node.has("name") ? node.get("name").asText() : "User";
+            if (userEmail == null || userEmail.isBlank()) {
+                System.err.println("No email in user-created message: " + message);
+                return;
+            }
+            String subject = "Welcome to EventEase, " + userName + "!";
+            String html = "<div style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>" +
+                    "<div style='background-color: #4CAF50; padding: 15px; text-align: center; color: white; border-radius: 8px 8px 0 0;'>"
+                    +
+                    "<h2 style='margin: 0;'>Welcome to EventEase!</h2>" +
+                    "</div>" +
+                    "<div style='padding: 20px; border: 1px solid #ddd; border-top: none; border-radius: 0 0 8px 8px; background-color: #f9f9f9;'>"
+                    +
+                    "<p style='font-size: 16px;'>Hello " + userName + ",</p>" +
+                    "<p style='font-size: 15px;'>Thank you for signing up for EventEase. We're thrilled to have you on board!</p>"
+                    +
+                    "<p style='font-size: 15px;'>With EventEase, you can easily browse and book tickets for your favorite events, manage your bookings, and stay updated with the latest happenings.</p>"
+                    +
+                    "<p style='font-size: 15px;'>If you have any questions or need assistance, feel free to reach out to our support team at any time.</p>"
+                    +
+                    "<p style='font-size: 15px;'>Happy Eventing! 🎉</p>" +
+                    "<p style='font-size: 15px;'>Best Regards,<br/>The EventEase Team</p>" +
+                    "</div>" +
+                    "</div>";
+            emailService.sendHtmlEmail(userEmail, subject, html);
+            System.out.println("✅ Sent welcome email to " + userEmail);
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.err.println("❌ Failed to process user-created message: " + message);
+        }
+    }
 }

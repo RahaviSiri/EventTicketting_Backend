@@ -34,4 +34,9 @@ public class KafkaTopicConfig {
         return TopicBuilder.name("contact-messages").build();
     }
 
+    @Bean
+    public NewTopic userCreatedTopic() {
+        return TopicBuilder.name("user-created").build();
+    }
+
 }

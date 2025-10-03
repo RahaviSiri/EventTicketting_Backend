@@ -13,8 +13,25 @@ public class UserService {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    UserNotification UserNotification;
+
     public void registerUser(User user) {
+        // Save user
         userRepository.save(user);
+
+        // Publish welcome email
+        try {
+            String payload = String.format(
+                    "{ \"email\": \"%s\", \"name\": \"%s\" }",
+                    user.getEmail(),
+                    user.getName());
+
+            UserNotification.publishUserCreated(payload);
+            System.out.println("Published welcome email for userId=" + user.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public String getUserRole(String email) {
