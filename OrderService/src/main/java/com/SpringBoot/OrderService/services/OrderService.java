@@ -73,4 +73,11 @@ public class OrderService {
         return savedOrder;
     }
 
+    public Page<Order> getOrdersByUserIDAndMonth(Long userID, Integer month, Integer year, Pageable pageable) {
+        // month is 1-12
+        LocalDateTime start = LocalDateTime.of(year, month, 1, 0, 0);
+        LocalDateTime end = start.plusMonths(1); // exclusive end
+        return orderRepository.findByUserIdAndCreatedAtBetween(userID, start, end, pageable);
+    }
+
 }
