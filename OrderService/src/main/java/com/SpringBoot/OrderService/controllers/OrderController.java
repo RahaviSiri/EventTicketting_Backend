@@ -39,10 +39,21 @@ public class OrderController {
     public ResponseEntity<Page<Order>> getOrdersByUserID(
             @PathVariable Long userID,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "6") int size,
+            @RequestParam(required = false) Integer month, // 1-12
+            @RequestParam(required = false) Integer year) {
+                
+        // Even though your JPQL query looks like it selects all bookings for a month, pagination is applied at the database level, so only the requested page is actually returned.
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Order> orders = orderService.getOrderByUserID(userID, pageable);
+        Page<Order> orders;
+
+        if (month != null && year != null) {
+            orders = orderService.getOrdersByUserIDAndMonth(userID, month, year, pageable);
+        } else {
+            orders = orderService.getOrderByUserID(userID, pageable);
+        }
+
         return ResponseEntity.ok(orders);
     }
 
