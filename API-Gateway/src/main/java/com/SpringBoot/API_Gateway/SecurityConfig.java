@@ -11,7 +11,6 @@ import org.springframework.security.web.server.authentication.AuthenticationWebF
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 import org.springframework.http.HttpMethod;
 
-
 @Configuration
 @EnableWebFluxSecurity
 public class SecurityConfig {
@@ -20,7 +19,7 @@ public class SecurityConfig {
     private final JwtServerAuthenticationConverter jwtConverter;
 
     public SecurityConfig(JwtAuthenticationManager jwtAuthenticationManager,
-                          JwtServerAuthenticationConverter jwtConverter) {
+            JwtServerAuthenticationConverter jwtConverter) {
         this.jwtAuthenticationManager = jwtAuthenticationManager;
         this.jwtConverter = jwtConverter;
     }
@@ -32,13 +31,15 @@ public class SecurityConfig {
 
         return http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors().and()
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
+                        .pathMatchers("/api/notifications/**").permitAll()
                         .pathMatchers("/api/users/login", "/api/users/register").permitAll()
-                        .anyExchange().authenticated()
-                )
+                        .anyExchange().authenticated())
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .addFilterAt(authWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .build();
     }
+
 }

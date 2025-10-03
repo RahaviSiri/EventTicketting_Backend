@@ -8,18 +8,18 @@ spring:
         webflux:
           globalcors:
             cors-configurations:
-              "[/**]":
+              '[/**]':
                 allowedOrigins: "http://localhost:5173"
                 allowedMethods:
                   - GET
                   - POST
                   - PUT
                   - DELETE
-                allowedHeaders:
-                  - "*"
+                  - OPTIONS
+                allowedHeaders: "*"
                 allowCredentials: true
 
-          routes:   # ✅ moved under server.webflux
+          routes:   
             - id: event-service
               uri: lb://EventServices
               predicates:
@@ -48,3 +48,7 @@ spring:
               uri: lb://OrderService
               predicates:
                 - Path=/api/orders/**
+            - id: notification-service
+              uri: lb://NotificationService
+              predicates:
+                - Path=/api/notifications/**

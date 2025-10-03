@@ -114,7 +114,7 @@ public ResponseEntity<Map<String, Object>> confirmSeat(
     boolean allSuccess = true;
 
     List<String> seats = req.getSeatNumbers();
-    System.out.println(seats);
+    System.out.println("Seats: .... " + seats);
     if(seats.size() == 0){
         response.put("success", false);
         response.put("results", Collections.emptyList());
