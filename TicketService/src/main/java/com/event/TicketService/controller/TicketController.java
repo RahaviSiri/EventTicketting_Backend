@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -208,6 +210,32 @@ public class TicketController {
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/revenue/event/{eventId}/year/{year}")
+    public ResponseEntity<List<Double>> getAnnualRevenueForEvent(
+            @PathVariable Long eventId,
+            @PathVariable int year) {
+        try {
+            // Ensure the year is a valid value (you could add checks if needed)
+            if (year < 1900 || year > LocalDate.now().getYear()) {
+                return new ResponseEntity<>(HttpStatus.BAD_REQUEST); // Invalid year
+            }
+
+            // Call the service method to get the annual revenue (monthly revenue for each
+            // month)
+            List<Double> annualRevenue = ticketService.getAnnualRevenueForEvent(eventId, year);
+
+            // Handle case where the event doesn't have any revenue for the year
+            if (annualRevenue == null || annualRevenue.isEmpty()) {
+                return new ResponseEntity<>(Collections.emptyList(), HttpStatus.OK); // No revenue for the year
+            }
+
+            return new ResponseEntity<>(annualRevenue, HttpStatus.OK);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // Internal server error
         }
     }
 

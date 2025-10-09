@@ -61,7 +61,16 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
         @Query(value = "SELECT COUNT(t) FROM tickets t WHERE t.event_id = :eventId", nativeQuery = true)
         Long countTicketsByEvent(@Param("eventId") Long eventId);
 
+        // Find Monthly Revenue for a event
+        @Query(value = "SELECT COALESCE(SUM(t.price), 0) " +
+                        "FROM tickets t " +
+                        "WHERE t.event_id = :eventId " +
+                        "AND t.event_date BETWEEN :startDate AND :endDate", nativeQuery = true)
+        Double findMonthlyRevenueForEvent(@Param("eventId") Long eventId,
+                        @Param("startDate") LocalDateTime startDate,
+                        @Param("endDate") LocalDateTime endDate);
+
 }
 
-
-// COALESCE = "Give me the first value that isn’t null, or a default if all are null."
+// COALESCE = "Give me the first value that isn’t null, or a default if all are
+// null."

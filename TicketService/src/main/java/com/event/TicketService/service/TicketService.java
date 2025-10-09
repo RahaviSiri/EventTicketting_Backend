@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -206,6 +207,24 @@ public class TicketService {
         LocalDateTime next24 = now.plusHours(24);
         List<com.event.TicketService.model.Ticket> tickets = ticketRepository.findByEventDateBetween(now, next24);
         return tickets.stream().map(this::convertToDTO).collect(Collectors.toList());
+    }
+
+    // Get revenue for a specific event for a specific month
+    public List<Double> getAnnualRevenueForEvent(Long eventId, int year) {
+        List<Double> monthlyRevenues = new ArrayList<>();
+
+        for (int month = 1; month <= 12; month++) {
+            // Get the start and end date for the current month
+            LocalDateTime startDate = LocalDateTime.of(year, month, 1, 0, 0, 0, 0);
+            LocalDateTime endDate = startDate.withDayOfMonth(startDate.toLocalDate().lengthOfMonth()).withHour(23)
+                    .withMinute(59).withSecond(59);
+
+            // Call the repository method with the calculated start and end date
+            Double revenue = ticketRepository.findMonthlyRevenueForEvent(eventId, startDate, endDate);
+            monthlyRevenues.add(revenue); // Add revenue for the month to the list
+        }
+
+        return monthlyRevenues;
     }
 
 }
