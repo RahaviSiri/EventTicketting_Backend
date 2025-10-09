@@ -69,6 +69,16 @@ public class UserService {
                         .name(user.getName())
                         .email(user.getEmail())
                         .build())
-                .orElse(null); // or throw exception if you prefer
+                .orElse(null);
+    }
+
+    public void changePassword(String email, String hashedPassword) {
+        var user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            user.get().setPasswordHash(hashedPassword);
+            userRepository.save(user.get());
+        } else {
+            System.out.println("User not found for email: " + email);
+        }
     }
 }
