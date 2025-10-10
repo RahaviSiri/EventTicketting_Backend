@@ -2,6 +2,7 @@ package com.event.TicketService.controller;
 
 import com.event.TicketService.dto.CreateTicketRequest;
 import com.event.TicketService.dto.TicketDTO;
+import com.event.TicketService.model.Ticket;
 import com.event.TicketService.model.TicketStatus;
 import com.event.TicketService.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,9 @@ import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 @RestController
 @RequestMapping("/api/tickets")
@@ -238,5 +242,13 @@ public class TicketController {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR); // Internal server error
         }
     }
+
+    // Get ticket by Ticket Number
+    @GetMapping("/ticket-number/{ticketNumber}")
+    public ResponseEntity<Ticket> getTicketByTicketNumber(@PathVariable String ticketNumber) {
+        Ticket ticket = ticketService.getTicketByTicketNumber(ticketNumber);
+        return ResponseEntity.ok(ticket);
+    }
+    
 
 }

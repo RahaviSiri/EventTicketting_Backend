@@ -12,10 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.SpringBoot.OrderService.dto.OrderCreateDTO;
 import com.SpringBoot.OrderService.models.Order;
 import com.SpringBoot.OrderService.services.OrderService;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.http.HttpStatus;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -60,6 +63,16 @@ public class OrderController {
     @PostMapping
     public ResponseEntity<?> createOrder(@RequestBody OrderCreateDTO orderDTO) {
         return ResponseEntity.ok(orderService.createOrder(orderDTO));
+    }
+
+    @PutMapping("/{ticketId}/check-in/{checkIn}")
+    public ResponseEntity<String> updateCheckInStatus(@PathVariable Long ticketId, @PathVariable boolean checkIn) {
+        try {
+            orderService.changeCheckInStatus(ticketId, checkIn);
+            return ResponseEntity.ok("Check-in status updated successfully");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        }
     }
 
 }

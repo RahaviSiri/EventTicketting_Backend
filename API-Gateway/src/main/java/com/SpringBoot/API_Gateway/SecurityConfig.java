@@ -35,7 +35,7 @@ public class SecurityConfig {
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
                         .pathMatchers("/api/notifications/**").permitAll()
-                        .pathMatchers("/api/users/login", "/api/users/register").permitAll()
+                        .pathMatchers("/api/users/login", "/api/users/register", "/api/users/verify-email", "/api/users/change-password").permitAll()
                         .anyExchange().authenticated())
                 .securityContextRepository(NoOpServerSecurityContextRepository.getInstance())
                 .addFilterAt(authWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
