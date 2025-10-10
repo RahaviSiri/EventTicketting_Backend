@@ -227,4 +227,12 @@ public class TicketService {
         return monthlyRevenues;
     }
 
+    public Ticket getTicketByTicketNumber(String ticketNumber) {
+        Optional<Ticket> ticketOpt = ticketRepository.findByTicketNumber(ticketNumber);
+        if (ticketOpt.isPresent()) {
+            return ticketOpt.get();
+        }
+        throw new RuntimeException("Ticket not found with ticket number: " + ticketNumber);
+    }
+
 }

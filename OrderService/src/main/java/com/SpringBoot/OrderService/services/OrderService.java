@@ -1,6 +1,7 @@
 package com.SpringBoot.OrderService.services;
 
 import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,6 +12,8 @@ import com.SpringBoot.OrderService.dto.OrderCreateDTO;
 import com.SpringBoot.OrderService.dto.UserDTO;
 import com.SpringBoot.OrderService.models.Order;
 import com.SpringBoot.OrderService.repository.OrderRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class OrderService {
@@ -80,4 +83,12 @@ public class OrderService {
         return orderRepository.findByUserIdAndCreatedAtBetween(userID, start, end, pageable);
     }
 
+    @Transactional
+    public void changeCheckInStatus(Long ticketId, boolean checkIn) {
+        Order order = orderRepository.findByTicketId(ticketId)
+                .orElseThrow(() -> new RuntimeException("Order not found with ticketId: " + ticketId));
+
+        order.setCheckIn(checkIn);
+        orderRepository.save(order);
+    }
 }

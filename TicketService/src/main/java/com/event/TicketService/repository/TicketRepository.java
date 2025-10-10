@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface TicketRepository extends JpaRepository<Ticket, Long> {
@@ -69,6 +70,8 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
         Double findMonthlyRevenueForEvent(@Param("eventId") Long eventId,
                         @Param("startDate") LocalDateTime startDate,
                         @Param("endDate") LocalDateTime endDate);
+
+        Optional<Ticket> findByTicketNumber(String ticketNumber);
 
 }
 
