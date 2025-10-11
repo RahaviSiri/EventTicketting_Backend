@@ -225,4 +225,15 @@ public class PaymentController {
         }
     }
 
+    // admin part
+    @GetMapping("/summary")
+    public Map<String, Object> getRevenueSummary(@RequestParam String range) {
+        return paymentService.getRevenueSummary(range);
+    }
+
+    @GetMapping("/monthly")
+    public List<Map<String, Object>> getRevenueLast6Months() {
+        return paymentService.getLast6MonthsRevenue();
+    }
+
 }

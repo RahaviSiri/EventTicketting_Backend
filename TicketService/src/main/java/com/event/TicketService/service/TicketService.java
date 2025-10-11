@@ -5,12 +5,18 @@ import com.event.TicketService.dto.TicketDTO;
 import com.event.TicketService.model.Ticket;
 import com.event.TicketService.model.TicketStatus;
 import com.event.TicketService.repository.TicketRepository;
+import com.event.TicketService.util.DateRangeUtil;
+
+import ch.qos.logback.core.util.Duration;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -201,6 +207,26 @@ public class TicketService {
         return ticketRepository.countTicketsByEvent(eventId);
     }
 
+    // admin part
+
+    public Map<String, Object> getTicketsSummary(String range) {
+        LocalDateTime fromDate = DateRangeUtil.resolveFrom(range);
+        LocalDateTime toDate = LocalDateTime.now();
+
+        // Total tickets sold in the range
+        int total = ticketRepository.countTicketsSoldBetween(fromDate, toDate);
+
+        long days = java.time.Duration.between(fromDate, toDate).toDays();
+        LocalDateTime previousFrom = fromDate.minusDays(days);
+        LocalDateTime previousTo = fromDate;
+        int previous = ticketRepository.countTicketsSoldBetween(previousFrom, previousTo);
+
+        double trend = previous == 0 ? 0 : ((double) (total - previous) / previous) * 100;
+
+        return Map.of(
+                "total", total,
+                "trend", Math.round(trend * 100.0) / 100.0);
+    }
     // Get tickets for events happening within the next 24 hours
     public List<TicketDTO> getTicketsForUpcomingEvents() {
         LocalDateTime now = LocalDateTime.now();
