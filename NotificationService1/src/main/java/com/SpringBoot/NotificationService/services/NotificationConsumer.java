@@ -93,7 +93,7 @@ public class NotificationConsumer {
                         continue;
                     }
 
-                    String subject = "📢 Event Update: " + ticket.getEvent_name();
+                    String subject = "📢 Event Update: " + ticket.getEventName();
 
                     // Styled HTML email body
                     String html = "<div style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>" +
@@ -110,12 +110,12 @@ public class NotificationConsumer {
                             "<table style='width: 100%; border-collapse: collapse; margin-top: 15px;'>" +
                             "<tr>" +
                             "<td style='padding: 8px; font-weight: bold; width: 120px;'>🎤 Event:</td>" +
-                            "<td style='padding: 8px;'>" + ticket.getEvent_name() + "</td>" +
+                            "<td style='padding: 8px;'>" + ticket.getEventName() + "</td>" +
                             "</tr>" +
                             "<tr style='background-color: #fff;'>" +
                             "<td style='padding: 8px; font-weight: bold;'>📍 Venue:</td>" +
                             "<td style='padding: 8px;'>"
-                            + (ticket.getVenue_name() == null ? "" : ticket.getVenue_name()) + "</td>" +
+                            + (ticket.getVenueName() == null ? "" : ticket.getVenueName()) + "</td>" +
                             "</tr>" +
                             "<tr>" +
                             "<td style='padding: 8px; font-weight: bold;'>🗓 Date & Time:</td>" +
@@ -157,10 +157,10 @@ public class NotificationConsumer {
     public void handleEventCancelled(String message) {
         try {
             TicketDTO dummy = TicketDTO.builder()
-                    .event_name("Event Cancelled")
+                    .eventName("Event Cancelled")
                     .seatNumbers("")
                     .qrCode("")
-                    .venue_name("")
+                    .venueName("")
                     .build();
             emailService.sendTicketEmail("user@example.com", "Event Cancelled", dummy);
         } catch (Exception e) {

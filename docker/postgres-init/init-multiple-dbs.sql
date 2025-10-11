@@ -1,0 +1,7 @@
+CREATE DATABASE users_db;
+CREATE DATABASE events_db;
+CREATE DATABASE seats_db;
+CREATE DATABASE ticket_db;
+CREATE DATABASE payment_db;
+CREATE DATABASE discounts_db;
+CREATE DATABASE order_db;

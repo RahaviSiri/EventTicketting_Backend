@@ -13,6 +13,7 @@ import com.SpringBoot.OrderService.dto.UserDTO;
 import com.SpringBoot.OrderService.models.Order;
 import com.SpringBoot.OrderService.repository.OrderRepository;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 
 @Service
@@ -23,6 +24,11 @@ public class OrderService {
 
     @Autowired
     UserServiceClient userServiceClient;
+
+    @PostConstruct
+    public void verifyFeignLoaded() {
+        System.out.println("✅ Feign client instance injected: " + (userServiceClient != null));
+    }
 
     @Autowired
     NotificationProducer notificationProducer;
@@ -41,6 +47,7 @@ public class OrderService {
 
     public Object createOrder(OrderCreateDTO dto) {
         // 1. Get user details
+        System.out.println("Fetching user details for userId: " + dto.getUserId());
         UserDTO user = userServiceClient.getUserById(dto.getUserId());
         System.out.println("Fetched user details: " + user);
 

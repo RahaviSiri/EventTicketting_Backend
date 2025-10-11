@@ -47,9 +47,9 @@ public class Ticket {
     private LocalDateTime eventDate;
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    private String venue_name;
+    private String venueName;
 
     @Column(nullable = false, columnDefinition = "TEXT")
-    private String event_name;
+    private String eventName;
 
 }
