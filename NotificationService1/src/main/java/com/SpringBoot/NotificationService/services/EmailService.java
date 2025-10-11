@@ -68,11 +68,11 @@ public class EmailService {
                             "</tr>" +
                             "<tr style='background-color:#fff;'>" +
                                 "<td style='padding:8px; font-weight:bold;'>🎤 Event:</td>" +
-                                "<td style='padding:8px;'>" + ticket.getEvent_name() + "</td>" +
+                                "<td style='padding:8px;'>" + ticket.getEventName() + "</td>" +
                             "</tr>" +
                             "<tr>" +
                                 "<td style='padding:8px; font-weight:bold;'>📍 Venue:</td>" +
-                                "<td style='padding:8px;'>" + ticket.getVenue_name() + "</td>" +
+                                "<td style='padding:8px;'>" + ticket.getVenueName() + "</td>" +
                             "</tr>" +
                             "<tr style='background-color:#fff;'>" +
                                 "<td style='padding:8px; font-weight:bold;'>🗓 Date:</td>" +

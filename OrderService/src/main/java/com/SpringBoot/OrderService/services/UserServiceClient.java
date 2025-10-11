@@ -5,7 +5,9 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "UserService", url = "http://localhost:8087") 
+// @FeignClient(name = "UserService")
+// @FeignClient(name = "user-service")
+@FeignClient(name = "USERSERVICE")
 public interface UserServiceClient {
 
     @GetMapping("/api/users/users/{id}")

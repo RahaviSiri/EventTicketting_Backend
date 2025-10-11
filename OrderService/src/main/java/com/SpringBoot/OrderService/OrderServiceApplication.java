@@ -5,14 +5,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 
-
-@SpringBootApplication
+@SpringBootApplication(scanBasePackages = "com.SpringBoot.OrderService")
 @EnableDiscoveryClient
-@EnableFeignClients
+@EnableFeignClients(basePackages = "com.SpringBoot.OrderService.services")
 public class OrderServiceApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(OrderServiceApplication.class, args);
-	}
-
+    public static void main(String[] args) {
+        System.out.println("🚀 Starting OrderService Application...");
+        SpringApplication.run(OrderServiceApplication.class, args);
+        System.out.println("✅ Feign clients should now be registered if scanning worked!");
+    }
 }

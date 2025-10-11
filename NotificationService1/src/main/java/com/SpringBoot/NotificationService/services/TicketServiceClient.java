@@ -7,9 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import com.SpringBoot.NotificationService.dto.TicketDTO;
 
-
-
-@FeignClient(name = "TicketService", url = "http://localhost:8086") 
+@FeignClient(name = "TicketService")
 public interface TicketServiceClient {
 
     @GetMapping("/api/tickets/{id}")
