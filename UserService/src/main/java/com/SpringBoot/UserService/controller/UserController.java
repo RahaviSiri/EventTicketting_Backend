@@ -3,11 +3,15 @@ package com.SpringBoot.UserService.controller;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.SpringBoot.UserService.dto.UserDTO;
@@ -15,6 +19,7 @@ import com.SpringBoot.UserService.model.User;
 import com.SpringBoot.UserService.repository.UserRepository;
 import com.SpringBoot.UserService.services.UserService;
 import com.SpringBoot.UserService.utils.JwtUtils;
+import com.SpringBoot.UserService.dto.UserDTO;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -90,7 +95,6 @@ public class UserController {
         Long userID = userService.getUserID(email);
         return ResponseEntity.ok(Map.of("userID", userID));
     }
-
     @GetMapping("/users/{id}")
     public ResponseEntity<?> getUserByID(@PathVariable Long id) {
         UserDTO userDTO = userService.getUserById(id);
@@ -100,28 +104,29 @@ public class UserController {
         return ResponseEntity.ok(userDTO);
     }
 
+    
     // @PostMapping("/verify-email")
     // public ResponseEntity<?> verifyEmail(@RequestBody String email) {
-    // boolean exists = userRepository.findByEmail(email).isPresent();
-    // if (exists) {
-    // return ResponseEntity.ok("Email exists");
-    // } else {
-    // return ResponseEntity.status(400).body("Email is not available");
-    // }
-    // }
-
-    @PostMapping("/verify-email")
-    public ResponseEntity<?> verifyEmail(@RequestBody Map<String, String> request) {
-        String email = request.get("email");
-        boolean exists = userRepository.findByEmail(email).isPresent();
-
-        if (exists) {
-            return ResponseEntity.ok(Map.of("message", "Email exists"));
-        } else {
-            return ResponseEntity.status(404).body(Map.of("message", "Email not found"));
-        }
+        // boolean exists = userRepository.findByEmail(email).isPresent();
+        // if (exists) {
+            // return ResponseEntity.ok("Email exists");
+            // } else {
+                // return ResponseEntity.status(400).body("Email is not available");
+                // }
+                // }
+                
+                @PostMapping("/verify-email")
+                public ResponseEntity<?> verifyEmail(@RequestBody Map<String, String> request) {
+                    String email = request.get("email");
+                    boolean exists = userRepository.findByEmail(email).isPresent();
+                    
+                    if (exists) {
+                        return ResponseEntity.ok(Map.of("message", "Email exists"));
+                    } else {
+                        return ResponseEntity.status(404).body(Map.of("message", "Email not found"));
+                    }
     }
-
+    
     @PostMapping("/change-password")
     public ResponseEntity<?> changePassword(@RequestBody Map<String, String> body) {
         String email = body.get("email");
@@ -129,5 +134,32 @@ public class UserController {
         String hashedPassword = passwordEncoder.encode(newPassword);
         userService.changePassword(email, hashedPassword);
         return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
+    }
+    
+    //        Admin Endpoints
+    
+    @GetMapping("/summary")
+    public Map<String, Object> getOrganizersSummary(@RequestParam String range) {
+        return userService.getOrganizersSummary(range);
+    }
+    
+    @GetMapping("/monthly-signups")
+    public List<Map<String, Object>> getSignupsLast6Months() {
+        return userService.getSignupsLast6Months();
+    }
+   
+    @GetMapping("/organizers")
+    public ResponseEntity<Page<UserDTO>> getAllOrganizers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        PageRequest pageable = PageRequest.of(page, size);
+        Page<UserDTO> organizers = userService.getAllOrganizers(pageable);
+        return ResponseEntity.ok(organizers);
+    }
+
+    @GetMapping("/{id}/username-and-email")
+    public UserDTO getUsernameAndEmailById(@PathVariable Long id) {
+        return userService.getUserById(id);
     }
 }

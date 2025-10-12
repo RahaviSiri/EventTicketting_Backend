@@ -6,12 +6,14 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.SpringBoot.EventServices.dto.EventAdminDto;
 import com.SpringBoot.EventServices.dto.EventDTO;
 import com.SpringBoot.EventServices.dto.EventWithDetailsDto;
 import com.SpringBoot.EventServices.dto.SeatingChartRequest;
 import com.SpringBoot.EventServices.model.Event;
 import com.SpringBoot.EventServices.services.EventService;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,8 +43,8 @@ public class EventController {
     @GetMapping("/paged")
     public ResponseEntity<Page<Event>> getAllEvents(@RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
-            Pageable pageable = PageRequest.of(page, size);
-            Page<Event> events = eventService.getAllEvents(pageable);
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Event> events = eventService.getAllEvents(pageable);
         return ResponseEntity.ok(events);
     }
 
@@ -103,4 +106,76 @@ public class EventController {
     // public void setLayoutJson(String layoutJson) { this.layoutJson = layoutJson;
     // }
     // }
+
+    // admin part
+
+    // @GetMapping("/count")
+    // public ResponseEntity<Map<String, Long>> getEventCount() {
+    // return ResponseEntity.ok(Map.of("totalEvents",
+    // eventService.getEventCount()));
+    // }
+
+    @GetMapping("/summary")
+    public Map<String, Object> getEventsSummary(@RequestParam String range) {
+        return eventService.getEventsSummary(range);
+    }
+
+    @GetMapping("/monthly-events")
+    public List<Map<String, Object>> getEventsLast6Months() {
+        return eventService.getEventsLast6Months();
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Map<String, Object>> getAllEventsForAdminRaw(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<EventAdminDto> eventsPage = eventService.getAllEventsForAdmin(pageable);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", eventsPage.getContent());
+        response.put("pageable", Map.of(
+                "pageNumber", eventsPage.getNumber(),
+                "pageSize", eventsPage.getSize()));
+        response.put("totalElements", eventsPage.getTotalElements());
+        response.put("totalPages", eventsPage.getTotalPages());
+        response.put("isFirst", eventsPage.isFirst());
+        response.put("isLast", eventsPage.isLast());
+
+        return ResponseEntity.ok(response);
+    }
+
+    // get active events based on organizerId
+    @GetMapping("/active/count/{organizerId}")
+    public ResponseEntity<Long> getActiveEventsCount(@PathVariable Long organizerId) {
+        return ResponseEntity.ok(eventService.getActiveEventsCount(organizerId));
+    }
+
+    @GetMapping("/pending/count/{organizerId}")
+    public ResponseEntity<Long> getPendingEventsCount(@PathVariable Long organizerId) {
+        return ResponseEntity.ok(eventService.getPendingEventsCount(organizerId));
+    }
+
+    // @GetMapping("/admin/{eventId}")
+    // public ResponseEntity<EventAdminDto> getEventByIdForAdmin(@PathVariable Long eventId) {
+    //     EventAdminDto event = eventService.getEventByIdForAdmin(eventId);
+    //     return ResponseEntity.ok(event);
+    // }
+
+    @GetMapping("/admin/{id}")
+    public ResponseEntity<Map<String, Object>> getEventByIdForAdmin(@PathVariable Long id) {
+        Map<String, Object> event = eventService.getEventByIdForAdmin(id);
+        if (event == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(event);
+    }
+
+    @PutMapping("/{eventId}/status/{status}")
+    public ResponseEntity<String> updateEventStatus(@PathVariable Long eventId,
+            @PathVariable String status) {
+        eventService.updateEventStatus(eventId, status);
+        return ResponseEntity.ok("Event status updated to " + status);
+    }
 }

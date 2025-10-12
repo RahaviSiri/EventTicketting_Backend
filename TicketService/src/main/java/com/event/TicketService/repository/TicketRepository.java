@@ -62,7 +62,6 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
         @Query(value = "SELECT COUNT(t) FROM tickets t WHERE t.event_id = :eventId", nativeQuery = true)
         Long countTicketsByEvent(@Param("eventId") Long eventId);
 
-        // Find Monthly Revenue for a event
         @Query(value = "SELECT COALESCE(SUM(t.price), 0) " +
                         "FROM tickets t " +
                         "WHERE t.event_id = :eventId " +
@@ -72,6 +71,21 @@ public interface TicketRepository extends JpaRepository<Ticket, Long> {
                         @Param("endDate") LocalDateTime endDate);
 
         Optional<Ticket> findByTicketNumber(String ticketNumber);
+        // admin part
+        @Query("SELECT COUNT(t) " +
+                        "FROM Ticket t " +
+                        "WHERE t.status = 'SOLD' " +
+                        "AND YEAR(t.purchaseDate) = :year " +
+                        "AND MONTH(t.purchaseDate) = :month")
+        int countTicketsSoldByMonth(@Param("year") int year, @Param("month") int month);
+
+        @Query("SELECT COUNT(t) " +
+                        "FROM Ticket t " +
+                        "WHERE t.status = 'SOLD' " +
+                        "AND t.purchaseDate >= :from AND t.purchaseDate < :to")
+        int countTicketsSoldBetween(@Param("from") LocalDateTime from,
+                        @Param("to") LocalDateTime to);
+        // Find Monthly Revenue for a event
 
 }
 

@@ -66,5 +66,20 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     // Find completed payments by date range
     @Query("SELECT p FROM Payment p WHERE p.status = 'COMPLETED' AND p.createdAt BETWEEN :startDate AND :endDate")
     List<Payment> findCompletedPaymentsByDateRange(@Param("startDate") LocalDateTime startDate, 
-                                                   @Param("endDate") LocalDateTime endDate);
+            @Param("endDate") LocalDateTime endDate);
+                                                   
+    // for admin part
+
+    // monthly revenue
+    @Query("SELECT COALESCE(SUM(p.amount), 0) " +
+            "FROM Payment p " +
+            "WHERE YEAR(p.createdAt) = :year " +
+            "AND MONTH(p.createdAt) = :month")
+    long sumRevenueByMonth(@Param("year") int year, @Param("month") int month);
+
+    // for calculate trend 
+    @Query("SELECT COALESCE(SUM(p.amount), 0) " +
+            "FROM Payment p " +
+            "WHERE p.createdAt >= :from AND p.createdAt < :to")
+    long sumRevenueBetween(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to);
 }

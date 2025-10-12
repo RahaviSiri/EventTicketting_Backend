@@ -205,6 +205,12 @@ public class TicketController {
         return ResponseEntity.ok(count);
     }
 
+    // admin part
+
+    @GetMapping("/summary")
+    public Map<String, Object> getTicketsSummary(@RequestParam String range) {
+        return ticketService.getTicketsSummary(range);
+    }
     // Get upcoming tickets (events happening within next 24 hours)
     @GetMapping("/upcoming")
     public ResponseEntity<List<TicketDTO>> getUpcomingTickets() {

@@ -1,11 +1,24 @@
 package com.SpringBoot.UserService.services;
 
+import org.apache.kafka.common.errors.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.SpringBoot.UserService.dto.UserDTO;
 import com.SpringBoot.UserService.model.User;
 import com.SpringBoot.UserService.repository.UserRepository;
+import com.SpringBoot.UserService.utils.DateRangeUtil;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -61,7 +74,7 @@ public class UserService {
         }
         return null;
     }
-
+    
     public UserDTO getUserById(Long id) {
         return userRepository.findById(id)
                 .map(user -> UserDTO.builder()
@@ -81,4 +94,52 @@ public class UserService {
             System.out.println("User not found for email: " + email);
         }
     }
+
+    //        admin part  
+    
+    
+    public Map<String, Object> getOrganizersSummary(String range) {
+        LocalDateTime fromDate = DateRangeUtil.resolveFrom(range);
+        LocalDateTime toDate = LocalDateTime.now();
+        
+        // Current period organizers
+        int total = userRepository.countOrganizersBetween(fromDate, toDate);
+        
+        // Previous period organizers (same length)
+        long days = java.time.Duration.between(fromDate, toDate).toDays();
+        LocalDateTime previousFrom = fromDate.minusDays(days);
+        LocalDateTime previousTo = fromDate;
+        int previous = userRepository.countOrganizersBetween(previousFrom, previousTo);
+        
+        double trend = previous == 0 ? 0 : ((double) (total - previous) / previous) * 100;
+        
+        return Map.of(
+            "total", total,
+            "trend", trend);
+        }
+        
+        public List<Map<String, Object>> getSignupsLast6Months() {
+            List<Map<String, Object>> result = new ArrayList<>();
+            
+            LocalDate now = LocalDate.now();
+            for (int i = 5; i >= 0; i--) {
+                YearMonth month = YearMonth.from(now.minusMonths(i));
+                int signups = userRepository.countSignupsByMonth(month.getYear(), month.getMonthValue());
+                result.add(Map.of(
+                    "month", month.getMonth().name().substring(0, 3),
+                    "signups", signups
+                    ));
+                }
+                return result;
+            }
+           
+            public Page<UserDTO> getAllOrganizers(Pageable pageable) {
+                Page<User> organizers = userRepository.findByRole("ORGANIZER", pageable);
+
+                return organizers.map(user -> new UserDTO(
+                        user.getId(),
+                        user.getName(),
+                        user.getEmail()));
+            }
+
 }

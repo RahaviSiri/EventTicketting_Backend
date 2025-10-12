@@ -6,6 +6,7 @@ import com.event.PaymentService.dto.PaymentResponse;
 import com.event.PaymentService.model.Payment;
 import com.event.PaymentService.model.PaymentStatus;
 import com.event.PaymentService.repository.PaymentRepository;
+import com.event.PaymentService.util.DateRangeUtil;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
@@ -17,7 +18,13 @@ import org.springframework.stereotype.Service;
 import com.event.PaymentService.mapper.PaymentMapper;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -256,4 +263,41 @@ public class PaymentService {
         throw new RuntimeException("Payment not found with payment id: " + paymentId);
     }
 
+    // admin part
+
+    public List<Map<String, Object>> getLast6MonthsRevenue() {
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        LocalDate now = LocalDate.now();
+        for (int i = 5; i >= 0; i--) {
+            YearMonth month = YearMonth.from(now.minusMonths(i));
+            long revenue = paymentRepository.sumRevenueByMonth(month.getYear(), month.getMonthValue());
+
+            result.add(Map.of(
+                "month", month.getMonth().name().substring(0, 3), // "Jan", "Feb"
+                "revenue", revenue
+            ));
+        }
+        return result;
+}
+
+
+    public Map<String, Object> getRevenueSummary(String range) {
+        LocalDateTime fromDate = DateRangeUtil.resolveFrom(range);
+        LocalDateTime toDate = LocalDateTime.now();
+
+        // Total revenue in the range
+        long total = paymentRepository.sumRevenueBetween(fromDate, toDate);
+
+        long days = java.time.Duration.between(fromDate, toDate).toDays();
+        LocalDateTime previousFrom = fromDate.minusDays(days);
+        LocalDateTime previousTo = fromDate;
+        long previous = paymentRepository.sumRevenueBetween(previousFrom, previousTo);
+
+        double trend = previous == 0 ? 0 : ((double) (total - previous) / previous) * 100;
+
+        return Map.of(
+                "total", total,
+                "trend", Math.round(trend * 100.0) / 100.0);
+    }
 }
