@@ -1,7 +1,6 @@
 package com.SpringBoot.AdminService.controller;
 
 import com.SpringBoot.AdminService.dto.AdminDashboardDto;
-import com.SpringBoot.AdminService.dto.EventAdminDto;
 import com.SpringBoot.AdminService.dto.OrganizerManagementDto;
 import com.SpringBoot.AdminService.service.AdminService;
 

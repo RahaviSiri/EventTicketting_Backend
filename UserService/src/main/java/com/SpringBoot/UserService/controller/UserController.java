@@ -19,7 +19,6 @@ import com.SpringBoot.UserService.model.User;
 import com.SpringBoot.UserService.repository.UserRepository;
 import com.SpringBoot.UserService.services.UserService;
 import com.SpringBoot.UserService.utils.JwtUtils;
-import com.SpringBoot.UserService.dto.UserDTO;
 
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -162,4 +161,10 @@ public class UserController {
     public UserDTO getUsernameAndEmailById(@PathVariable Long id) {
         return userService.getUserById(id);
     }
+
+    @PostMapping("/encode")
+        public String encodePassword(@RequestBody Map<String, String> body) {
+            return passwordEncoder.encode(body.get("password"));
+    }
+
 }
