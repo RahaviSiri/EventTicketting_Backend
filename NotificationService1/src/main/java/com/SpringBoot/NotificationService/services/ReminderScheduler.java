@@ -48,7 +48,7 @@ public class ReminderScheduler {
                 }
 
                 // 3. Send reminder email
-                String subject = "🎟️ Event Reminder: " + ticket.getEvent_name();
+                String subject = "🎟️ Event Reminder: " + ticket.getEventName();
 
                 String body = "<div style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>" +
                         "<div style='background-color: #4CAF50; padding: 15px; text-align: center; color: white; border-radius: 8px 8px 0 0;'>"
@@ -65,11 +65,11 @@ public class ReminderScheduler {
                         "<table style='width: 100%; border-collapse: collapse; margin-top: 15px;'>" +
                         "<tr>" +
                         "<td style='padding: 8px; font-weight: bold; width: 120px;'>🎤 Event:</td>" +
-                        "<td style='padding: 8px;'>" + ticket.getEvent_name() + "</td>" +
+                        "<td style='padding: 8px;'>" + ticket.getEventName() + "</td>" +
                         "</tr>" +
                         "<tr style='background-color: #fff;'>" +
                         "<td style='padding: 8px; font-weight: bold;'>📍 Venue:</td>" +
-                        "<td style='padding: 8px;'>" + ticket.getVenue_name() + "</td>" +
+                        "<td style='padding: 8px;'>" + ticket.getVenueName() + "</td>" +
                         "</tr>" +
                         "<tr>" +
                         "<td style='padding: 8px; font-weight: bold;'>🗓 Date & Time:</td>" +

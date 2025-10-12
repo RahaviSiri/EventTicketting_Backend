@@ -10,9 +10,10 @@ public class ContactKafkaProducer {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
-    private final String topic = "contact-messages";
+    private static final String topic = "contact-messages";
 
     public void sendMessage(String messageJson) {
+        System.out.println("📨 Sending contact message to Kafka: " + messageJson);
         kafkaTemplate.send(topic, messageJson);
     }
 }

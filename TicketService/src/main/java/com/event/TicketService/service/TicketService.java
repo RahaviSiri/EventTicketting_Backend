@@ -46,8 +46,8 @@ public class TicketService {
         ticket.setStatus(TicketStatus.CONFIRMED);
         ticket.setPurchaseDate(LocalDateTime.now());
         ticket.setEventDate(request.getEventDate());
-        ticket.setVenue_name(request.getVenueName());
-        ticket.setEvent_name(request.getEventName());
+        ticket.setVenueName(request.getVenueName());
+        ticket.setEventName(request.getEventName());
 
         // Generate QR code
         String qrCode = qrCodeService.generateQRCode(ticketNumber);
@@ -181,8 +181,8 @@ public class TicketService {
                 .status(ticket.getStatus())
                 .purchaseDate(ticket.getPurchaseDate())
                 .qrCode(ticket.getQrCode())
-                .event_name(ticket.getEvent_name())
-                .venue_name(ticket.getVenue_name())
+                .eventName(ticket.getEventName())
+                .venueName(ticket.getVenueName())
                 .eventDate(ticket.getEventDate())
                 .build();
     }

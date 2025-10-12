@@ -21,7 +21,7 @@ public class TicketDTO {
     private TicketStatus status;
     private LocalDateTime purchaseDate;
     private String qrCode;
-    private String venue_name;
-    private String event_name;
+    private String venueName;
+    private String eventName;
     private LocalDateTime eventDate;
 }

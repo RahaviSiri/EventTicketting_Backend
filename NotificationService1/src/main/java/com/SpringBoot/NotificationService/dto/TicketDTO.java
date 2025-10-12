@@ -9,11 +9,11 @@ import java.time.LocalDateTime;
 @Builder
 public class TicketDTO {
     private Long id;
-    private String event_name;
+    private String eventName;
     private LocalDateTime eventDate;
     private String seatNumbers;  // store as "A1,A2,A3"
     private Double price;
-    private String venue_name;
+    private String venueName;
     private String qrCode; 
     private Long userId;
 }

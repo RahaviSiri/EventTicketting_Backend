@@ -29,8 +29,8 @@ class TicketRepositoryTest {
         t.setPurchaseDate(LocalDateTime.now());
         t.setQrCode("qr");
         t.setEventDate(LocalDateTime.now().plusDays(1));
-        t.setVenue_name("V");
-        t.setEvent_name("E");
+        t.setVenueName("V");
+        t.setEventName("E");
 
         ticketRepository.save(t);
 
@@ -52,8 +52,8 @@ class TicketRepositoryTest {
         t.setPurchaseDate(now.minusDays(1));
         t.setQrCode("qr2");
         t.setEventDate(now.plusHours(12));
-        t.setVenue_name("V2");
-        t.setEvent_name("E2");
+        t.setVenueName("V2");
+        t.setEventName("E2");
 
         ticketRepository.save(t);
 
