@@ -4,28 +4,25 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
-
 import com.SpringBoot.AdminService.dto.UserDTO;
-
 import org.springframework.data.domain.Page;
-
 import java.util.List;
 import java.util.Map;
 
-@FeignClient(name = "UserService", path = "/api/users")
+@FeignClient(name = "UserService")
 public interface UserClient {
 
-    @GetMapping("/summary")
+    @GetMapping("/api/users/summary")
     Map<String, Object> getOrganizersSummary(@RequestParam("range") String range);
 
-    @GetMapping("/monthly-signups")
+    @GetMapping("/api/users/monthly-signups")
     List<Map<String, Object>> getSignupsLast6Months();
 
-    @GetMapping("/organizers")
+    @GetMapping("/api/users/organizers")
     Page<UserDTO> getAllOrganizers(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size);
 
-    @GetMapping("/{id}/username-and-email")
+    @GetMapping("/api/users/{id}/username-and-email")
     UserDTO getUsernameAndEmailById(@PathVariable Long id);
 }

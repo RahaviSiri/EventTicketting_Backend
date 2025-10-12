@@ -6,8 +6,9 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-@FeignClient(name = "TicketService", path = "/api/tickets")
+@FeignClient(name = "TicketService")
 public interface TicketClient {
-    @GetMapping("/summary")
+
+    @GetMapping("/api/tickets/summary")
     Map<String, Object> getTicketsSummary(@RequestParam("range") String range);
 }

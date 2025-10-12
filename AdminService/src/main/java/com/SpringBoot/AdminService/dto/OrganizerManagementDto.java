@@ -1,8 +1,12 @@
 package com.SpringBoot.AdminService.dto;
 
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@Builder
+@NoArgsConstructor
 public class OrganizerManagementDto {
     private Long id;
     private String name;

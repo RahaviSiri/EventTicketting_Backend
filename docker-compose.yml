@@ -199,6 +199,24 @@ services:
       - SPRING_CLOUD_LOADBALANCER_RETRY_ENABLED=true
     networks:
       - eventnet
+  
+  # =====================
+  # Admin Service
+  # =====================
+  admin-service:
+    build: ./AdminService
+    container_name: admin-service
+    ports:
+      - "8095:8095"
+    depends_on:
+      - service-registry
+      - postgres
+    environment:
+      - SPRING_APPLICATION_NAME=AdminService
+      - SERVER_PORT=8095
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://service-registry:8761/eureka
+    networks:
+      - eventnet
 
   # =====================
   # PostgreSQL
