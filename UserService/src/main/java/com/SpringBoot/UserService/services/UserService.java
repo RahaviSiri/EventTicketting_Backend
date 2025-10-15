@@ -24,7 +24,7 @@ public class UserService {
     UserRepository userRepository;
 
     @Autowired
-    UserNotification UserNotification;
+    UserNotification userNotification;
 
     public void registerUser(User user) {
         // Save user
@@ -37,7 +37,7 @@ public class UserService {
                     user.getEmail(),
                     user.getName());
 
-            UserNotification.publishUserCreated(payload);
+            userNotification.publishUserCreated(payload);
             System.out.println("Published welcome email for userId=" + user.getId());
         } catch (Exception e) {
             e.printStackTrace();

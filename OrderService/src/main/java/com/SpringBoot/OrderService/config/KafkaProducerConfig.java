@@ -1,4 +1,4 @@
-package com.SpringBoot.NotificationService.config;
+package com.SpringBoot.OrderService.config;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -40,7 +40,7 @@ public class KafkaProducerConfig {
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
         config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 
-        // 🔒 Security
+        // 🔒 Security for Aiven
         config.put("security.protocol", securityProtocol);
         config.put("sasl.mechanism", saslMechanism);
         config.put("sasl.jaas.config", jaasConfig);
@@ -55,4 +55,3 @@ public class KafkaProducerConfig {
         return new KafkaTemplate<>(producerFactory());
     }
 }
-
