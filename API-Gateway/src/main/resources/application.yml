@@ -9,61 +9,63 @@ spring:
           globalcors:
             cors-configurations:
               "[/**]":
-                allowedOrigins: "http://localhost:5173, http://localhost:5174"
+                allowedOrigins: ${ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174}
                 allowedMethods:
                   - GET
                   - POST
                   - PUT
                   - DELETE
+                  - HEAD
                   - OPTIONS
                 allowedHeaders: "*"
                 allowCredentials: true
 
-          routes:   
-            - id: event-service
-              uri: lb://EventServices
-              predicates:
-                - Path=/api/events/**
-            - id: user-service
-              uri: lb://UserService
-              predicates:
-                - Path=/api/users/**
-            - id: seating-service
-              uri: lb://SeatingService
-              predicates:
-                - Path=/api/seating-charts/**
-            - id: ticket-service
-              uri: lb://TicketService
-              predicates:
-                - Path=/api/tickets/**
-            - id: payment-service
-              uri: lb://PaymentService
-              predicates:
-                - Path=/api/payments/**
-            - id: admin-service
-              uri: lb://AdminService
-              predicates:
-                - Path=/api/admin/**
+      routes:
+        - id: event-service
+          uri: lb://EventServices
+          predicates:
+            - Path=/api/events/**
+        - id: user-service
+          uri: lb://UserService
+          predicates:
+            - Path=/api/users/**
+        - id: seating-service
+          uri: lb://SeatingService
+          predicates:
+            - Path=/api/seating-charts/**
+        - id: ticket-service
+          uri: https://ticket-service-77yu.onrender.com
+          predicates:
+            - Path=/api/tickets/**
+        - id: payment-service
+          uri: lb://PaymentService
+          predicates:
+            - Path=/api/payments/**
+        - id: admin-service
+          uri: lb://AdminService
+          predicates:
+            - Path=/api/admin/**
+        - id: discount-service
+          uri: lb://DiscountService
+          predicates:
+            - Path=/api/discounts/**
+        - id: order-service
+          uri: lb://OrderService
+          predicates:
+            - Path=/api/orders/**
+        - id: notification-service
+          uri: lb://NotificationService
+          predicates:
+            - Path=/api/notifications/**
 
-
-            - id: discount-service
-              uri: lb://DiscountService
-              predicates:
-                - Path=/api/discounts/**
-            - id: order-service
-              uri: lb://OrderService
-              predicates:
-                - Path=/api/orders/**
-            - id: notification-service
-              uri: lb://NotificationService
-              predicates:
-                - Path=/api/notifications/**
 eureka:
   client:
-    # Uses the Docker service name at runtime. Falls back to localhost when running outside Docker.
     service-url:
       defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://service-registry:8761/eureka}
     fetch-registry: true
     register-with-eureka: true
   instance:
     prefer-ip-address: true
+
+server:
+  port: ${PORT:8080}

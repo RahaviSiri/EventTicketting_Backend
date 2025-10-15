@@ -15,7 +15,7 @@ public class NotificationConsumer {
     @Autowired
     private EmailService emailService;
 
-    @Value("${spring.mail.username}")
+    @Value("${spring.mail.from:rahavi24siri@gmail.com}")
     private String supportEmail;
 
     @Autowired

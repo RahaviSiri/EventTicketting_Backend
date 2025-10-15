@@ -1,8 +1,8 @@
 package com.SpringBoot.API_Gateway;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-// import org.springframework.security.authentication.ReactiveAuthenticationManager;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
@@ -23,8 +23,11 @@ public class SecurityConfig {
     private final JwtAuthenticationManager jwtAuthenticationManager;
     private final JwtServerAuthenticationConverter jwtConverter;
 
+    @Value("${ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174}")
+    private String allowedOrigins;
+
     public SecurityConfig(JwtAuthenticationManager jwtAuthenticationManager,
-            JwtServerAuthenticationConverter jwtConverter) {
+                          JwtServerAuthenticationConverter jwtConverter) {
         this.jwtAuthenticationManager = jwtAuthenticationManager;
         this.jwtConverter = jwtConverter;
     }
@@ -39,9 +42,10 @@ public class SecurityConfig {
                 .cors().and()
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers(HttpMethod.OPTIONS).permitAll()
+                        .pathMatchers(HttpMethod.HEAD).permitAll()
                         .pathMatchers("/api/notifications/**").permitAll()
-                        .pathMatchers("/api/users/login", "/api/users/register", "/api/users/verify-email",
-                                "/api/users/change-password")
+                        .pathMatchers("/api/users/login", "/api/users/register",
+                                      "/api/users/verify-email", "/api/users/change-password")
                         .permitAll()
                         .pathMatchers("/api/admin/**").permitAll()
                         .anyExchange().authenticated())
@@ -53,10 +57,8 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(Arrays.asList(
-                "http://localhost:5173",
-                "http://localhost:5174"));
-        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        config.setAllowedOrigins(Arrays.asList(allowedOrigins.split(",")));
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS"));
         config.setAllowedHeaders(Arrays.asList("*"));
         config.setAllowCredentials(true);
 
@@ -64,5 +66,4 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", config);
         return source;
     }
-
 }
