@@ -23,7 +23,7 @@ public class SecurityConfig {
     private final JwtAuthenticationManager jwtAuthenticationManager;
     private final JwtServerAuthenticationConverter jwtConverter;
 
-    @Value("${ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174}")
+    @Value("${ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,https://client-frontend-pp19.onrender.com,https://admin-frontend-040x.onrender.com}")
     private String allowedOrigins;
 
     public SecurityConfig(JwtAuthenticationManager jwtAuthenticationManager,
