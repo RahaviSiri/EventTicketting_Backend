@@ -34,7 +34,7 @@ spring:
           predicates:
             - Path=/api/seating-charts/**
         - id: ticket-service
-          uri: https://ticket-service-77yu.onrender.com
+          uri: https://ticket-service-olla.onrender.com
           predicates:
             - Path=/api/tickets/**
         - id: payment-service
