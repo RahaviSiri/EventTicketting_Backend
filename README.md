@@ -1,8 +1,8 @@
 # EventTicketting_Backend
 
-🎟️ EventEase — Event Ticketing & Management System (Backend)
+# 🎟️ EventEase — Event Ticketing & Management System (Backend)
 
-🧾 Overview
+## 🧾 Overview
 **EventEase** is a microservices-based Event Ticketing and Management platform designed to handle end-to-end event workflows — from event creation and seat management to ticket booking, payments, notifications, and discounts.  
 This repository contains the **backend microservices** that power the EventEase system.
 
@@ -74,4 +74,3 @@ The root `docker-compose.yml` coordinates:
 Example startup:
 ```bash
 docker-compose up --build
-
