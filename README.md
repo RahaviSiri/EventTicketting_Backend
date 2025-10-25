@@ -10,19 +10,23 @@ This repository contains the **backend microservices** that power the EventEase 
 The system follows a **Spring Boot microservices architecture** with each service containerized using **Docker** and registered under a centralized **Service Registry (Eureka)**.  
 API requests are routed through a **Spring Cloud Gateway** which performs JWT-based authentication and CORS handling.
 
-### 🔹 Microservices Included
-Service and Description 
-**Service Registry** - Eureka Server for service discovery 
-**API Gateway** - Entry point for all frontend requests (JWT authentication, CORS) 
-**User Service** - Handles user registration, authentication, and profile management 
-**Event Service** - Manages event creation, details, and updates 
-**Seating Service** - Dynamically manages seat layouts and availability 
-**Ticket Service** - Issues and validates tickets, integrates with Stripe payments 
-**Payment Service** - Handles Stripe payments and transaction confirmations 
-**Discount Service** - Manages percentage/fixed discounts and coupon codes 
-**Order Service** - Coordinates order creation and ticket confirmation 
-**Notification Service** - Sends email notifications and reminders via SendGrid 
-**Admin Service** - Admin dashboard APIs (user management, event analytics) 
+## 🧱 Microservices Breakdown
+
+| Service | Description | Port |
+|----------|--------------|------|
+| **Service Registry** | Eureka Server for service discovery | 8761 |
+| **API Gateway** | Central routing & authentication point | 8080 |
+| **User Service** | Handles signup, login, profile management | 8087 |
+| **Event Service** | Manages event creation and details | 8082 |
+| **Seating Service** | Seat layout and availability management | 8083 |
+| **Ticket Service** | Ticket generation, QR code creation | 8084 |
+| **Payment Service** | Stripe payment handling | 8085 |
+| **Discount Service** | Manages discounts and promo codes | 8086 |
+| **Order Service** | Coordinates orders and transaction logic | 8088 |
+| **Notification Service** | Sends email confirmations/reminders | 8092 |
+| **Admin Service** | Admin dashboard and event analytics | 8090 |
+
+--- 
 
 ## ⚙️ Tech Stack
 ### Backend Frameworks:
@@ -74,3 +78,5 @@ The root `docker-compose.yml` coordinates:
 Example startup:
 ```bash
 docker-compose up --build
+```
+
